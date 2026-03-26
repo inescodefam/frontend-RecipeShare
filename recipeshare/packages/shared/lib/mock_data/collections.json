@@ -1,0 +1,38 @@
+[
+  {
+    "id": "col_user_0002_jess_1",
+    "userId": "user_0002_jess",
+    "name": "Quick Weeknight Wins",
+    "recipeIds": ["recipe_0002", "recipe_0008", "recipe_0014"]
+  },
+  {
+    "id": "col_user_0002_jess_2",
+    "userId": "user_0002_jess",
+    "name": "To Try Soon",
+    "recipeIds": ["recipe_0010", "recipe_0005", "recipe_0013"]
+  },
+  {
+    "id": "col_user_0004_aria_1",
+    "userId": "user_0004_aria",
+    "name": "Plant-Based Favorites",
+    "recipeIds": ["recipe_0002", "recipe_0004", "recipe_0012"]
+  },
+  {
+    "id": "col_user_0003_mateo_1",
+    "userId": "user_0003_mateo",
+    "name": "Spice & Italian",
+    "recipeIds": ["recipe_0003", "recipe_0013", "recipe_0008"]
+  },
+  {
+    "id": "col_user_0001_admin_1",
+    "userId": "user_0001_admin",
+    "name": "Featured Finds",
+    "recipeIds": ["recipe_0005", "recipe_0013", "recipe_0002"]
+  },
+  {
+    "id": "col_user_0009_leila_1",
+    "userId": "user_0009_leila",
+    "name": "Dessert Mood",
+    "recipeIds": ["recipe_0006", "recipe_0007"]
+  }
+]

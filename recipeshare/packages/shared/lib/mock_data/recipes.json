@@ -1,0 +1,451 @@
+[
+  {
+    "id": "recipe_0001",
+    "userId": "user_0002_jess",
+    "title": "Avocado Toast with Lemon",
+    "description": "Creamy avocado on toasted bread with a bright lemon finish.",
+    "photoUrl": "https://picsum.photos/seed/avocado-toast/600/400",
+    "prepTime": 10,
+    "cookTime": 5,
+    "servings": 2,
+    "difficulty": "easy",
+    "categoryId": "cat_breakfast",
+    "tagIds": ["tag_healthy", "tag_budget", "tag_gluten_free"],
+    "isFeature": false,
+    "likesCount": 34,
+    "averageRating": 4.7,
+    "createdAt": "2026-03-02T10:15:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0001_1", "recipeId": "recipe_0001", "name": "Gluten-free bread", "amount": 2.0, "unit": "slices"},
+      {"id": "ing_recipe_0001_2", "recipeId": "recipe_0001", "name": "Ripe avocado", "amount": 1.0, "unit": "avocado"},
+      {"id": "ing_recipe_0001_3", "recipeId": "recipe_0001", "name": "Lemon juice", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0001_4", "recipeId": "recipe_0001", "name": "Olive oil", "amount": 1.0, "unit": "tbsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0001_1", "recipeId": "recipe_0001", "stepNumber": 1, "description": "Toast the bread until golden."},
+      {"id": "step_recipe_0001_2", "recipeId": "recipe_0001", "stepNumber": 2, "description": "Scoop avocado into a bowl and mash until mostly smooth."},
+      {"id": "step_recipe_0001_3", "recipeId": "recipe_0001", "stepNumber": 3, "description": "Stir in lemon juice and a drizzle of olive oil."},
+      {"id": "step_recipe_0001_4", "recipeId": "recipe_0001", "stepNumber": 4, "description": "Spread onto toast and season to taste."}
+    ]
+  },
+
+  {
+    "id": "recipe_0002",
+    "userId": "user_0004_aria",
+    "title": "Vegan Overnight Oats",
+    "description": "Creamy, fridge-ready oats with chia and a touch of maple sweetness.",
+    "photoUrl": "https://picsum.photos/seed/overnight-oats/600/400",
+    "prepTime": 10,
+    "cookTime": 0,
+    "servings": 1,
+    "difficulty": "easy",
+    "categoryId": "cat_breakfast",
+    "tagIds": ["tag_vegan", "tag_quick", "tag_healthy", "tag_low_calorie"],
+    "isFeature": true,
+    "likesCount": 58,
+    "averageRating": 4.8,
+    "createdAt": "2026-03-03T08:30:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0002_1", "recipeId": "recipe_0002", "name": "Rolled oats", "amount": 0.75, "unit": "cup"},
+      {"id": "ing_recipe_0002_2", "recipeId": "recipe_0002", "name": "Chia seeds", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0002_3", "recipeId": "recipe_0002", "name": "Almond milk", "amount": 1.0, "unit": "cup"},
+      {"id": "ing_recipe_0002_4", "recipeId": "recipe_0002", "name": "Maple syrup", "amount": 1.0, "unit": "tbsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0002_1", "recipeId": "recipe_0002", "stepNumber": 1, "description": "Stir oats, chia, almond milk, and maple together in a jar."},
+      {"id": "step_recipe_0002_2", "recipeId": "recipe_0002", "stepNumber": 2, "description": "Cover and refrigerate overnight (or at least 6 hours)."},
+      {"id": "step_recipe_0002_3", "recipeId": "recipe_0002", "stepNumber": 3, "description": "In the morning, stir well and loosen with a splash of milk if needed."},
+      {"id": "step_recipe_0002_4", "recipeId": "recipe_0002", "stepNumber": 4, "description": "Top with fruit or nuts and enjoy cold."}
+    ]
+  },
+
+  {
+    "id": "recipe_0003",
+    "userId": "user_0003_mateo",
+    "title": "Italian Turkey Meatballs",
+    "description": "Juicy turkey meatballs simmered in a garlicky tomato sauce.",
+    "photoUrl": "https://picsum.photos/seed/turkey-meatballs/600/400",
+    "prepTime": 20,
+    "cookTime": 25,
+    "servings": 4,
+    "difficulty": "medium",
+    "categoryId": "cat_lunch",
+    "tagIds": ["tag_italian", "tag_budget"],
+    "isFeature": false,
+    "likesCount": 46,
+    "averageRating": 4.6,
+    "createdAt": "2026-03-04T12:05:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0003_1", "recipeId": "recipe_0003", "name": "Ground turkey", "amount": 1.0, "unit": "lb"},
+      {"id": "ing_recipe_0003_2", "recipeId": "recipe_0003", "name": "Breadcrumbs", "amount": 0.5, "unit": "cup"},
+      {"id": "ing_recipe_0003_3", "recipeId": "recipe_0003", "name": "Parmesan", "amount": 0.25, "unit": "cup"},
+      {"id": "ing_recipe_0003_4", "recipeId": "recipe_0003", "name": "Marinara sauce", "amount": 24.0, "unit": "oz"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0003_1", "recipeId": "recipe_0003", "stepNumber": 1, "description": "Mix turkey, breadcrumbs, and parmesan until just combined."},
+      {"id": "step_recipe_0003_2", "recipeId": "recipe_0003", "stepNumber": 2, "description": "Form into small meatballs (about 1.5 inches)."},
+      {"id": "step_recipe_0003_3", "recipeId": "recipe_0003", "stepNumber": 3, "description": "Brown meatballs in a pan, then add marinara."},
+      {"id": "step_recipe_0003_4", "recipeId": "recipe_0003", "stepNumber": 4, "description": "Simmer until cooked through and serve hot."}
+    ]
+  },
+
+  {
+    "id": "recipe_0004",
+    "userId": "user_0004_aria",
+    "title": "Spicy Tofu Stir-Fry",
+    "description": "Crispy-edged tofu with a spicy-sweet sauce and colorful veggies.",
+    "photoUrl": "https://picsum.photos/seed/tofu-stirfry/600/400",
+    "prepTime": 15,
+    "cookTime": 20,
+    "servings": 3,
+    "difficulty": "medium",
+    "categoryId": "cat_dinner",
+    "tagIds": ["tag_vegan", "tag_healthy", "tag_spicy", "tag_gluten_free", "tag_quick"],
+    "isFeature": false,
+    "likesCount": 64,
+    "averageRating": 4.5,
+    "createdAt": "2026-03-05T18:20:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0004_1", "recipeId": "recipe_0004", "name": "Extra-firm tofu", "amount": 14.0, "unit": "oz"},
+      {"id": "ing_recipe_0004_2", "recipeId": "recipe_0004", "name": "Sesame oil", "amount": 1.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0004_3", "recipeId": "recipe_0004", "name": "Soy sauce (tamari)", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0004_4", "recipeId": "recipe_0004", "name": "Chili flakes", "amount": 0.5, "unit": "tsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0004_1", "recipeId": "recipe_0004", "stepNumber": 1, "description": "Press tofu, then cube and pan-sear until golden."},
+      {"id": "step_recipe_0004_2", "recipeId": "recipe_0004", "stepNumber": 2, "description": "In the same pan, stir in sesame oil and chili flakes."},
+      {"id": "step_recipe_0004_3", "recipeId": "recipe_0004", "stepNumber": 3, "description": "Add tamari and toss tofu to coat."},
+      {"id": "step_recipe_0004_4", "recipeId": "recipe_0004", "stepNumber": 4, "description": "Serve with rice or noodles and finish with extra seasoning."}
+    ]
+  },
+
+  {
+    "id": "recipe_0005",
+    "userId": "user_0001_admin",
+    "title": "Garlic Butter Salmon",
+    "description": "Flaky salmon with a rich garlic-butter glaze and lemon brightness.",
+    "photoUrl": "https://picsum.photos/seed/garlic-butter-salmon/600/400",
+    "prepTime": 10,
+    "cookTime": 12,
+    "servings": 2,
+    "difficulty": "easy",
+    "categoryId": "cat_dinner",
+    "tagIds": ["tag_healthy", "tag_spicy"],
+    "isFeature": true,
+    "likesCount": 72,
+    "averageRating": 4.9,
+    "createdAt": "2026-03-06T07:40:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0005_1", "recipeId": "recipe_0005", "name": "Salmon fillets", "amount": 2.0, "unit": "fillets"},
+      {"id": "ing_recipe_0005_2", "recipeId": "recipe_0005", "name": "Garlic", "amount": 3.0, "unit": "cloves"},
+      {"id": "ing_recipe_0005_3", "recipeId": "recipe_0005", "name": "Butter", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0005_4", "recipeId": "recipe_0005", "name": "Lemon juice", "amount": 1.0, "unit": "tbsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0005_1", "recipeId": "recipe_0005", "stepNumber": 1, "description": "Pat salmon dry and season with salt and pepper."},
+      {"id": "step_recipe_0005_2", "recipeId": "recipe_0005", "stepNumber": 2, "description": "Sear salmon in a hot pan until browned."},
+      {"id": "step_recipe_0005_3", "recipeId": "recipe_0005", "stepNumber": 3, "description": "Lower heat; add garlic and butter until fragrant and glossy."},
+      {"id": "step_recipe_0005_4", "recipeId": "recipe_0005", "stepNumber": 4, "description": "Finish with lemon juice and serve immediately."}
+    ]
+  },
+
+  {
+    "id": "recipe_0006",
+    "userId": "user_0010_kira",
+    "title": "Chocolate Avocado Mousse",
+    "description": "Creamy chocolate mousse made with avocado for a lighter treat.",
+    "photoUrl": "https://picsum.photos/seed/choc-avocado-mousse/600/400",
+    "prepTime": 10,
+    "cookTime": 0,
+    "servings": 3,
+    "difficulty": "easy",
+    "categoryId": "cat_dessert",
+    "tagIds": ["tag_vegan", "tag_healthy", "tag_low_calorie", "tag_gluten_free"],
+    "isFeature": false,
+    "likesCount": 39,
+    "averageRating": 4.7,
+    "createdAt": "2026-03-07T14:10:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0006_1", "recipeId": "recipe_0006", "name": "Ripe avocados", "amount": 2.0, "unit": "avocados"},
+      {"id": "ing_recipe_0006_2", "recipeId": "recipe_0006", "name": "Cocoa powder", "amount": 0.25, "unit": "cup"},
+      {"id": "ing_recipe_0006_3", "recipeId": "recipe_0006", "name": "Maple syrup", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0006_4", "recipeId": "recipe_0006", "name": "Vanilla extract", "amount": 0.5, "unit": "tsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0006_1", "recipeId": "recipe_0006", "stepNumber": 1, "description": "Blend avocado, cocoa, maple, and vanilla until silky."},
+      {"id": "step_recipe_0006_2", "recipeId": "recipe_0006", "stepNumber": 2, "description": "Taste and adjust sweetness if needed."},
+      {"id": "step_recipe_0006_3", "recipeId": "recipe_0006", "stepNumber": 3, "description": "Spoon into cups and chill for 20 minutes."},
+      {"id": "step_recipe_0006_4", "recipeId": "recipe_0006", "stepNumber": 4, "description": "Serve cold and top with fruit if you like."}
+    ]
+  },
+
+  {
+    "id": "recipe_0007",
+    "userId": "user_0009_leila",
+    "title": "Berry Yogurt Parfait",
+    "description": "Layered yogurt, berries, and a crunchy gluten-free topping.",
+    "photoUrl": "https://picsum.photos/seed/berry-parfait/600/400",
+    "prepTime": 10,
+    "cookTime": 0,
+    "servings": 2,
+    "difficulty": "easy",
+    "categoryId": "cat_dessert",
+    "tagIds": ["tag_healthy", "tag_quick", "tag_gluten_free"],
+    "isFeature": false,
+    "likesCount": 33,
+    "averageRating": 4.5,
+    "createdAt": "2026-03-08T09:05:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0007_1", "recipeId": "recipe_0007", "name": "Greek yogurt", "amount": 300.0, "unit": "g"},
+      {"id": "ing_recipe_0007_2", "recipeId": "recipe_0007", "name": "Mixed berries", "amount": 2.0, "unit": "cups"},
+      {"id": "ing_recipe_0007_3", "recipeId": "recipe_0007", "name": "Honey", "amount": 1.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0007_4", "recipeId": "recipe_0007", "name": "Gluten-free granola", "amount": 0.75, "unit": "cup"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0007_1", "recipeId": "recipe_0007", "stepNumber": 1, "description": "Spoon yogurt into glasses."},
+      {"id": "step_recipe_0007_2", "recipeId": "recipe_0007", "stepNumber": 2, "description": "Add berries and drizzle with honey."},
+      {"id": "step_recipe_0007_3", "recipeId": "recipe_0007", "stepNumber": 3, "description": "Sprinkle granola between layers for crunch."},
+      {"id": "step_recipe_0007_4", "recipeId": "recipe_0007", "stepNumber": 4, "description": "Repeat layers and serve right away."}
+    ]
+  },
+
+  {
+    "id": "recipe_0008",
+    "userId": "user_0002_jess",
+    "title": "Crispy Chickpea Crunch",
+    "description": "Roasted chickpeas with smoky spices for an addictive snack.",
+    "photoUrl": "https://picsum.photos/seed/chickpea-crunch/600/400",
+    "prepTime": 10,
+    "cookTime": 25,
+    "servings": 4,
+    "difficulty": "easy",
+    "categoryId": "cat_snack",
+    "tagIds": ["tag_vegan", "tag_budget", "tag_gluten_free", "tag_spicy"],
+    "isFeature": false,
+    "likesCount": 41,
+    "averageRating": 4.6,
+    "createdAt": "2026-03-09T16:30:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0008_1", "recipeId": "recipe_0008", "name": "Chickpeas (drained)", "amount": 2.0, "unit": "cups"},
+      {"id": "ing_recipe_0008_2", "recipeId": "recipe_0008", "name": "Olive oil", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0008_3", "recipeId": "recipe_0008", "name": "Smoked paprika", "amount": 1.0, "unit": "tsp"},
+      {"id": "ing_recipe_0008_4", "recipeId": "recipe_0008", "name": "Chili powder", "amount": 0.5, "unit": "tsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0008_1", "recipeId": "recipe_0008", "stepNumber": 1, "description": "Toss chickpeas with oil and spices."},
+      {"id": "step_recipe_0008_2", "recipeId": "recipe_0008", "stepNumber": 2, "description": "Spread on a baking tray in a single layer."},
+      {"id": "step_recipe_0008_3", "recipeId": "recipe_0008", "stepNumber": 3, "description": "Roast at 425F until browned and crisp, shaking once."},
+      {"id": "step_recipe_0008_4", "recipeId": "recipe_0008", "stepNumber": 4, "description": "Cool slightly and snack away."}
+    ]
+  },
+
+  {
+    "id": "recipe_0009",
+    "userId": "user_0008_tom",
+    "title": "Low-Cal Turkey Lettuce Wraps",
+    "description": "Big flavor, lighter calories: seasoned turkey in crisp lettuce leaves.",
+    "photoUrl": "https://picsum.photos/seed/turkey-lettuce-wraps/600/400",
+    "prepTime": 15,
+    "cookTime": 18,
+    "servings": 3,
+    "difficulty": "easy",
+    "categoryId": "cat_snack",
+    "tagIds": ["tag_low_calorie", "tag_healthy", "tag_gluten_free"],
+    "isFeature": false,
+    "likesCount": 35,
+    "averageRating": 4.4,
+    "createdAt": "2026-03-10T11:25:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0009_1", "recipeId": "recipe_0009", "name": "Ground turkey", "amount": 1.0, "unit": "lb"},
+      {"id": "ing_recipe_0009_2", "recipeId": "recipe_0009", "name": "Mushrooms", "amount": 1.0, "unit": "cup"},
+      {"id": "ing_recipe_0009_3", "recipeId": "recipe_0009", "name": "Soy sauce (tamari)", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0009_4", "recipeId": "recipe_0009", "name": "Romaine lettuce", "amount": 6.0, "unit": "leaves"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0009_1", "recipeId": "recipe_0009", "stepNumber": 1, "description": "Brown turkey with mushrooms until cooked."},
+      {"id": "step_recipe_0009_2", "recipeId": "recipe_0009", "stepNumber": 2, "description": "Stir in tamari and season to taste."},
+      {"id": "step_recipe_0009_3", "recipeId": "recipe_0009", "stepNumber": 3, "description": "Warm lettuce leaves briefly to soften."},
+      {"id": "step_recipe_0009_4", "recipeId": "recipe_0009", "stepNumber": 4, "description": "Spoon filling into lettuce and wrap."}
+    ]
+  },
+
+  {
+    "id": "recipe_0010",
+    "userId": "user_0007_sam",
+    "title": "Fresh Ginger Lemon Tea",
+    "description": "Soothing ginger and lemon tea with a light honey finish.",
+    "photoUrl": "https://picsum.photos/seed/ginger-lemon-tea/600/400",
+    "prepTime": 10,
+    "cookTime": 10,
+    "servings": 2,
+    "difficulty": "easy",
+    "categoryId": "cat_drink",
+    "tagIds": ["tag_healthy", "tag_quick", "tag_gluten_free"],
+    "isFeature": false,
+    "likesCount": 27,
+    "averageRating": 4.6,
+    "createdAt": "2026-03-11T19:00:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0010_1", "recipeId": "recipe_0010", "name": "Fresh ginger", "amount": 1.0, "unit": "inch"},
+      {"id": "ing_recipe_0010_2", "recipeId": "recipe_0010", "name": "Lemon juice", "amount": 1.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0010_3", "recipeId": "recipe_0010", "name": "Honey", "amount": 1.0, "unit": "tsp"},
+      {"id": "ing_recipe_0010_4", "recipeId": "recipe_0010", "name": "Water", "amount": 2.0, "unit": "cups"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0010_1", "recipeId": "recipe_0010", "stepNumber": 1, "description": "Slice ginger and add to a small pot with water."},
+      {"id": "step_recipe_0010_2", "recipeId": "recipe_0010", "stepNumber": 2, "description": "Simmer gently for 8-10 minutes."},
+      {"id": "step_recipe_0010_3", "recipeId": "recipe_0010", "stepNumber": 3, "description": "Strain into a mug and stir in lemon juice."},
+      {"id": "step_recipe_0010_4", "recipeId": "recipe_0010", "stepNumber": 4, "description": "Sweeten with honey and enjoy hot."}
+    ]
+  },
+
+  {
+    "id": "recipe_0011",
+    "userId": "user_0005_maya",
+    "title": "Iced Matcha Latte",
+    "description": "Creamy matcha with ice and a lightly sweet finish.",
+    "photoUrl": "https://picsum.photos/seed/matcha-latte/600/400",
+    "prepTime": 5,
+    "cookTime": 0,
+    "servings": 1,
+    "difficulty": "easy",
+    "categoryId": "cat_drink",
+    "tagIds": ["tag_healthy", "tag_budget", "tag_low_calorie"],
+    "isFeature": false,
+    "likesCount": 30,
+    "averageRating": 4.4,
+    "createdAt": "2026-03-12T13:55:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0011_1", "recipeId": "recipe_0011", "name": "Matcha powder", "amount": 2.0, "unit": "tsp"},
+      {"id": "ing_recipe_0011_2", "recipeId": "recipe_0011", "name": "Milk (or oat milk)", "amount": 1.0, "unit": "cup"},
+      {"id": "ing_recipe_0011_3", "recipeId": "recipe_0011", "name": "Ice", "amount": 1.0, "unit": "cup"},
+      {"id": "ing_recipe_0011_4", "recipeId": "recipe_0011", "name": "Maple syrup", "amount": 1.0, "unit": "tsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0011_1", "recipeId": "recipe_0011", "stepNumber": 1, "description": "Whisk matcha with a small splash of hot water until smooth."},
+      {"id": "step_recipe_0011_2", "recipeId": "recipe_0011", "stepNumber": 2, "description": "Stir in maple syrup."},
+      {"id": "step_recipe_0011_3", "recipeId": "recipe_0011", "stepNumber": 3, "description": "Add ice to a glass and pour in milk."},
+      {"id": "step_recipe_0011_4", "recipeId": "recipe_0011", "stepNumber": 4, "description": "Combine with matcha and serve immediately."}
+    ]
+  },
+
+  {
+    "id": "recipe_0012",
+    "userId": "user_0006_noah",
+    "title": "Quinoa Stuffed Peppers",
+    "description": "Vegan quinoa filling with herbs, baked into tender peppers.",
+    "photoUrl": "https://picsum.photos/seed/quinoa-stuffed-peppers/600/400",
+    "prepTime": 20,
+    "cookTime": 30,
+    "servings": 4,
+    "difficulty": "medium",
+    "categoryId": "cat_dinner",
+    "tagIds": ["tag_vegan", "tag_gluten_free", "tag_healthy"],
+    "isFeature": false,
+    "likesCount": 44,
+    "averageRating": 4.7,
+    "createdAt": "2026-03-13T10:20:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0012_1", "recipeId": "recipe_0012", "name": "Quinoa (cooked)", "amount": 2.0, "unit": "cups"},
+      {"id": "ing_recipe_0012_2", "recipeId": "recipe_0012", "name": "Bell peppers", "amount": 4.0, "unit": "peppers"},
+      {"id": "ing_recipe_0012_3", "recipeId": "recipe_0012", "name": "Black beans", "amount": 1.0, "unit": "cup"},
+      {"id": "ing_recipe_0012_4", "recipeId": "recipe_0012", "name": "Herb seasoning", "amount": 1.0, "unit": "tbsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0012_1", "recipeId": "recipe_0012", "stepNumber": 1, "description": "Preheat oven and halve peppers; remove seeds."},
+      {"id": "step_recipe_0012_2", "recipeId": "recipe_0012", "stepNumber": 2, "description": "Mix quinoa, beans, and seasoning."},
+      {"id": "step_recipe_0012_3", "recipeId": "recipe_0012", "stepNumber": 3, "description": "Stuff peppers and bake until tender."},
+      {"id": "step_recipe_0012_4", "recipeId": "recipe_0012", "stepNumber": 4, "description": "Rest 5 minutes then serve warm."}
+    ]
+  },
+
+  {
+    "id": "recipe_0013",
+    "userId": "user_0008_tom",
+    "title": "Gluten-Free Spicy Arrabbiata Pasta",
+    "description": "Spicy tomato arrabbiata sauce over quick gluten-free pasta.",
+    "photoUrl": "https://picsum.photos/seed/arrabbiata/600/400",
+    "prepTime": 10,
+    "cookTime": 15,
+    "servings": 4,
+    "difficulty": "medium",
+    "categoryId": "cat_lunch",
+    "tagIds": ["tag_italian", "tag_spicy", "tag_gluten_free", "tag_quick"],
+    "isFeature": true,
+    "likesCount": 66,
+    "averageRating": 4.8,
+    "createdAt": "2026-03-14T15:35:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0013_1", "recipeId": "recipe_0013", "name": "Gluten-free pasta", "amount": 12.0, "unit": "oz"},
+      {"id": "ing_recipe_0013_2", "recipeId": "recipe_0013", "name": "Crushed tomatoes", "amount": 28.0, "unit": "oz"},
+      {"id": "ing_recipe_0013_3", "recipeId": "recipe_0013", "name": "Garlic", "amount": 3.0, "unit": "cloves"},
+      {"id": "ing_recipe_0013_4", "recipeId": "recipe_0013", "name": "Chili flakes", "amount": 1.0, "unit": "tsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0013_1", "recipeId": "recipe_0013", "stepNumber": 1, "description": "Boil pasta until just al dente."},
+      {"id": "step_recipe_0013_2", "recipeId": "recipe_0013", "stepNumber": 2, "description": "Sauter garlic briefly, then add crushed tomatoes and chili flakes."},
+      {"id": "step_recipe_0013_3", "recipeId": "recipe_0013", "stepNumber": 3, "description": "Simmer sauce 8-10 minutes to thicken."},
+      {"id": "step_recipe_0013_4", "recipeId": "recipe_0013", "stepNumber": 4, "description": "Toss pasta with sauce and serve hot."}
+    ]
+  },
+
+  {
+    "id": "recipe_0014",
+    "userId": "user_0003_mateo",
+    "title": "Honey Garlic Chicken Skewers",
+    "description": "Sweet, savory, and quick chicken skewers glazed with honey garlic.",
+    "photoUrl": "https://picsum.photos/seed/honey-garlic-chicken/600/400",
+    "prepTime": 15,
+    "cookTime": 20,
+    "servings": 4,
+    "difficulty": "easy",
+    "categoryId": "cat_dinner",
+    "tagIds": ["tag_budget", "tag_quick", "tag_healthy"],
+    "isFeature": false,
+    "likesCount": 48,
+    "averageRating": 4.6,
+    "createdAt": "2026-03-15T09:10:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0014_1", "recipeId": "recipe_0014", "name": "Chicken breast", "amount": 1.0, "unit": "lb"},
+      {"id": "ing_recipe_0014_2", "recipeId": "recipe_0014", "name": "Honey", "amount": 2.0, "unit": "tbsp"},
+      {"id": "ing_recipe_0014_3", "recipeId": "recipe_0014", "name": "Garlic", "amount": 4.0, "unit": "cloves"},
+      {"id": "ing_recipe_0014_4", "recipeId": "recipe_0014", "name": "Soy sauce (tamari)", "amount": 1.5, "unit": "tbsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0014_1", "recipeId": "recipe_0014", "stepNumber": 1, "description": "Cut chicken into bite-size pieces and skewer."},
+      {"id": "step_recipe_0014_2", "recipeId": "recipe_0014", "stepNumber": 2, "description": "Mix honey, garlic, and tamari as a quick glaze."},
+      {"id": "step_recipe_0014_3", "recipeId": "recipe_0014", "stepNumber": 3, "description": "Grill or pan-cook until chicken is cooked through."},
+      {"id": "step_recipe_0014_4", "recipeId": "recipe_0014", "stepNumber": 4, "description": "Brush with glaze and serve hot."}
+    ]
+  },
+
+  {
+    "id": "recipe_0015",
+    "userId": "user_0001_admin",
+    "title": "Protein Banana Pancakes",
+    "description": "Fluffy pancakes made with bananas for an easy protein-forward breakfast.",
+    "photoUrl": "https://picsum.photos/seed/protein-banana-pancakes/600/400",
+    "prepTime": 15,
+    "cookTime": 12,
+    "servings": 3,
+    "difficulty": "easy",
+    "categoryId": "cat_breakfast",
+    "tagIds": ["tag_quick", "tag_healthy", "tag_low_calorie"],
+    "isFeature": false,
+    "likesCount": 37,
+    "averageRating": 4.5,
+    "createdAt": "2026-03-16T12:00:00Z",
+    "ingredients": [
+      {"id": "ing_recipe_0015_1", "recipeId": "recipe_0015", "name": "Bananas (ripe)", "amount": 2.0, "unit": "bananas"},
+      {"id": "ing_recipe_0015_2", "recipeId": "recipe_0015", "name": "Eggs", "amount": 2.0, "unit": "eggs"},
+      {"id": "ing_recipe_0015_3", "recipeId": "recipe_0015", "name": "Protein powder", "amount": 0.25, "unit": "cup"},
+      {"id": "ing_recipe_0015_4", "recipeId": "recipe_0015", "name": "Baking powder", "amount": 1.0, "unit": "tsp"}
+    ],
+    "steps": [
+      {"id": "step_recipe_0015_1", "recipeId": "recipe_0015", "stepNumber": 1, "description": "Mash bananas and whisk with eggs until smooth."},
+      {"id": "step_recipe_0015_2", "recipeId": "recipe_0015", "stepNumber": 2, "description": "Stir in protein powder and baking powder."},
+      {"id": "step_recipe_0015_3", "recipeId": "recipe_0015", "stepNumber": 3, "description": "Cook batter on a lightly greased pan until bubbles form."},
+      {"id": "step_recipe_0015_4", "recipeId": "recipe_0015", "stepNumber": 4, "description": "Flip and cook until golden; serve warm."}
+    ]
+  }
+]

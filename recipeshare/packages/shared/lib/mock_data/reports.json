@@ -1,0 +1,62 @@
+[
+  {
+    "id": "rep_0001",
+    "reporterUserId": "user_0007_sam",
+    "targetType": "recipe",
+    "targetId": "recipe_0004",
+    "reason": "spam",
+    "description": null,
+    "status": "pending",
+    "createdAt": "2026-03-20T09:00:00Z"
+  },
+  {
+    "id": "rep_0002",
+    "reporterUserId": "user_0009_leila",
+    "targetType": "recipe",
+    "targetId": "recipe_0013",
+    "reason": "offensive",
+    "description": "The language in a comment thread felt offensive.",
+    "status": "pending",
+    "createdAt": "2026-03-20T12:35:00Z"
+  },
+  {
+    "id": "rep_0003",
+    "reporterUserId": "user_0002_jess",
+    "targetType": "user",
+    "targetId": "user_0003_mateo",
+    "reason": "inappropriate",
+    "description": "Repeatedly posting inappropriate comments.",
+    "status": "pending",
+    "createdAt": "2026-03-21T08:10:00Z"
+  },
+  {
+    "id": "rep_0004",
+    "reporterUserId": "user_0008_tom",
+    "targetType": "recipe",
+    "targetId": "recipe_0008",
+    "reason": "inappropriate",
+    "description": "User claims ingredient list is misleading.",
+    "status": "pending",
+    "createdAt": "2026-03-21T15:20:00Z"
+  },
+  {
+    "id": "rep_0005",
+    "reporterUserId": "user_0006_noah",
+    "targetType": "recipe",
+    "targetId": "recipe_0001",
+    "reason": "spam",
+    "description": null,
+    "status": "pending",
+    "createdAt": "2026-03-22T10:05:00Z"
+  },
+  {
+    "id": "rep_0006",
+    "reporterUserId": "user_0010_kira",
+    "targetType": "comment",
+    "targetId": "cmt_recipe_0006_1",
+    "reason": "offensive",
+    "description": "A user comment used harsh wording.",
+    "status": "approved",
+    "createdAt": "2026-03-18T13:50:00Z"
+  }
+]

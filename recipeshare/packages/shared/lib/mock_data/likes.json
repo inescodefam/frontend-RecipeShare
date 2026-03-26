@@ -1,0 +1,46 @@
+[
+  { "id": "like_recipe_0001_user_0002_jess", "userId": "user_0002_jess", "recipeId": "recipe_0001", "createdAt": "2026-03-03T11:00:00Z" },
+  { "id": "like_recipe_0001_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0001", "createdAt": "2026-03-03T12:00:00Z" },
+
+  { "id": "like_recipe_0002_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0002", "createdAt": "2026-03-03T13:00:00Z" },
+  { "id": "like_recipe_0002_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0002", "createdAt": "2026-03-03T14:10:00Z" },
+
+  { "id": "like_recipe_0003_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0003", "createdAt": "2026-03-05T10:30:00Z" },
+  { "id": "like_recipe_0003_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0003", "createdAt": "2026-03-05T11:05:00Z" },
+
+  { "id": "like_recipe_0004_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0004", "createdAt": "2026-03-06T09:20:00Z" },
+  { "id": "like_recipe_0004_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0004", "createdAt": "2026-03-06T10:00:00Z" },
+
+  { "id": "like_recipe_0005_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0005", "createdAt": "2026-03-07T12:40:00Z" },
+  { "id": "like_recipe_0005_user_0007_sam", "userId": "user_0007_sam", "recipeId": "recipe_0005", "createdAt": "2026-03-07T13:20:00Z" },
+
+  { "id": "like_recipe_0006_user_0007_sam", "userId": "user_0007_sam", "recipeId": "recipe_0006", "createdAt": "2026-03-08T16:05:00Z" },
+  { "id": "like_recipe_0006_user_0008_tom", "userId": "user_0008_tom", "recipeId": "recipe_0006", "createdAt": "2026-03-08T16:35:00Z" },
+
+  { "id": "like_recipe_0007_user_0008_tom", "userId": "user_0008_tom", "recipeId": "recipe_0007", "createdAt": "2026-03-09T08:55:00Z" },
+  { "id": "like_recipe_0007_user_0009_leila", "userId": "user_0009_leila", "recipeId": "recipe_0007", "createdAt": "2026-03-09T09:25:00Z" },
+
+  { "id": "like_recipe_0008_user_0009_leila", "userId": "user_0009_leila", "recipeId": "recipe_0008", "createdAt": "2026-03-10T15:10:00Z" },
+  { "id": "like_recipe_0008_user_0010_kira", "userId": "user_0010_kira", "recipeId": "recipe_0008", "createdAt": "2026-03-10T15:45:00Z" },
+
+  { "id": "like_recipe_0009_user_0010_kira", "userId": "user_0010_kira", "recipeId": "recipe_0009", "createdAt": "2026-03-11T10:20:00Z" },
+  { "id": "like_recipe_0009_user_0001_admin", "userId": "user_0001_admin", "recipeId": "recipe_0009", "createdAt": "2026-03-11T10:55:00Z" },
+
+  { "id": "like_recipe_0010_user_0001_admin", "userId": "user_0001_admin", "recipeId": "recipe_0010", "createdAt": "2026-03-12T09:15:00Z" },
+  { "id": "like_recipe_0010_user_0002_jess", "userId": "user_0002_jess", "recipeId": "recipe_0010", "createdAt": "2026-03-12T09:45:00Z" },
+
+  { "id": "like_recipe_0011_user_0002_jess", "userId": "user_0002_jess", "recipeId": "recipe_0011", "createdAt": "2026-03-13T13:30:00Z" },
+  { "id": "like_recipe_0011_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0011", "createdAt": "2026-03-13T13:55:00Z" },
+
+  { "id": "like_recipe_0012_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0012", "createdAt": "2026-03-14T11:10:00Z" },
+  { "id": "like_recipe_0012_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0012", "createdAt": "2026-03-14T11:35:00Z" },
+
+  { "id": "like_recipe_0013_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0013", "createdAt": "2026-03-15T07:05:00Z" },
+  { "id": "like_recipe_0013_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0013", "createdAt": "2026-03-15T07:35:00Z" },
+
+  { "id": "like_recipe_0014_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0014", "createdAt": "2026-03-16T09:25:00Z" },
+  { "id": "like_recipe_0014_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0014", "createdAt": "2026-03-16T09:55:00Z" },
+
+  { "id": "like_recipe_0015_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0015", "createdAt": "2026-03-16T15:10:00Z" },
+  { "id": "like_recipe_0015_user_0007_sam", "userId": "user_0007_sam", "recipeId": "recipe_0015", "createdAt": "2026-03-16T15:40:00Z" }
+]

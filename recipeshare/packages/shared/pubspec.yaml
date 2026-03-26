@@ -1,0 +1,37 @@
+name: shared
+description: Shared models, mock data, services, and UI primitives for RecipeShare apps.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.9.0
+  flutter_secure_storage: ^9.2.2
+  cached_network_image: ^3.4.1
+  google_fonts: ^6.2.0
+  shimmer: ^3.0.0
+  flutter_rating_bar: ^4.0.1
+  intl: ^0.19.0
+  uuid: ^4.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  assets:
+    - lib/mock_data/users.json
+    - lib/mock_data/recipes.json
+    - lib/mock_data/categories.json
+    - lib/mock_data/tags.json
+    - lib/mock_data/comments.json
+    - lib/mock_data/likes.json
+    - lib/mock_data/ratings.json
+    - lib/mock_data/collections.json
+    - lib/mock_data/reports.json
+    - lib/mock_data/follows.json

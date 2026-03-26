@@ -1,0 +1,156 @@
+[
+  {
+    "id": "cmt_recipe_0001_1",
+    "userId": "user_0007_sam",
+    "recipeId": "recipe_0001",
+    "content": "The lemon flavor really pops. I added chili flakes and it's perfect.",
+    "createdAt": "2026-03-05T09:10:00Z"
+  },
+  {
+    "id": "cmt_recipe_0001_2",
+    "userId": "user_0009_leila",
+    "recipeId": "recipe_0001",
+    "content": "Great texture! I used sourdough and it still worked well.",
+    "createdAt": "2026-03-05T14:42:00Z"
+  },
+  {
+    "id": "cmt_recipe_0002_1",
+    "userId": "user_0008_tom",
+    "recipeId": "recipe_0002",
+    "content": "Overnight oats never disappoint. This is officially my go-to.",
+    "createdAt": "2026-03-06T11:20:00Z"
+  },
+  {
+    "id": "cmt_recipe_0002_2",
+    "userId": "user_0006_noah",
+    "recipeId": "recipe_0002",
+    "content": "Chia + almond milk combo is so good. I'll try it with berries next.",
+    "createdAt": "2026-03-06T17:05:00Z"
+  },
+  {
+    "id": "cmt_recipe_0003_1",
+    "userId": "user_0002_jess",
+    "recipeId": "recipe_0003",
+    "content": "Really juicy meatballs - easy sauce too. 10/10 for busy lunches.",
+    "createdAt": "2026-03-10T10:05:00Z"
+  },
+  {
+    "id": "cmt_recipe_0003_2",
+    "userId": "user_0004_aria",
+    "recipeId": "recipe_0003",
+    "content": "I love that it's not overly complicated. Would make again.",
+    "createdAt": "2026-03-10T12:30:00Z"
+  },
+  {
+    "id": "cmt_recipe_0003_3",
+    "userId": "user_0009_leila",
+    "recipeId": "recipe_0003",
+    "content": "The parmesan flavor is perfect. Next time I'll add more herbs.",
+    "createdAt": "2026-03-10T18:10:00Z"
+  },
+  {
+    "id": "cmt_recipe_0003_4",
+    "userId": "user_0001_admin",
+    "recipeId": "recipe_0003",
+    "content": "Nice! Did you brown them hard for extra flavor?",
+    "createdAt": "2026-03-10T19:00:00Z"
+  },
+  {
+    "id": "cmt_recipe_0003_5",
+    "userId": "user_0003_mateo",
+    "recipeId": "recipe_0003",
+    "content": "Glad you liked it! Herbs make a big difference - try adding basil in the simmer.",
+    "createdAt": "2026-03-10T19:15:00Z"
+  },
+  {
+    "id": "cmt_recipe_0003_6",
+    "userId": "user_0008_tom",
+    "recipeId": "recipe_0003",
+    "content": "This looks restaurant-level. How long did you simmer the sauce?",
+    "createdAt": "2026-03-10T20:00:00Z"
+  },
+  {
+    "id": "cmt_recipe_0004_1",
+    "userId": "user_0005_maya",
+    "recipeId": "recipe_0004",
+    "content": "Tofu came out crispy and the sauce clings nicely.",
+    "createdAt": "2026-03-11T08:20:00Z"
+  },
+  {
+    "id": "cmt_recipe_0004_2",
+    "userId": "user_0002_jess",
+    "recipeId": "recipe_0004",
+    "content": "I doubled the chili flakes. It's spicy (in the best way).",
+    "createdAt": "2026-03-11T09:05:00Z"
+  },
+  {
+    "id": "cmt_recipe_0004_3",
+    "userId": "user_0004_aria",
+    "recipeId": "recipe_0004",
+    "content": "Agree - tamari made it so flavorful. Did you cook tofu first separately?",
+    "createdAt": "2026-03-11T11:10:00Z"
+  },
+  {
+    "id": "cmt_recipe_0004_4",
+    "userId": "user_0001_admin",
+    "recipeId": "recipe_0004",
+    "content": "Great question - yes, searing separately helps keep the edges crisp.",
+    "createdAt": "2026-03-11T12:00:00Z"
+  },
+  {
+    "id": "cmt_recipe_0005_1",
+    "userId": "user_0006_noah",
+    "recipeId": "recipe_0005",
+    "content": "Flaky and flavorful. The lemon butter glaze is a must.",
+    "createdAt": "2026-03-12T16:45:00Z"
+  },
+  {
+    "id": "cmt_recipe_0005_2",
+    "userId": "user_0007_sam",
+    "recipeId": "recipe_0005",
+    "content": "That garlic butter aroma while it's cooking... unreal.",
+    "createdAt": "2026-03-12T18:10:00Z"
+  },
+  {
+    "id": "cmt_recipe_0006_1",
+    "userId": "user_0008_tom",
+    "recipeId": "recipe_0006",
+    "content": "Chocolate mousse but somehow lighter. I'm obsessed.",
+    "createdAt": "2026-03-13T09:30:00Z"
+  },
+  {
+    "id": "cmt_recipe_0006_2",
+    "userId": "user_0002_jess",
+    "recipeId": "recipe_0006",
+    "content": "The avocado is totally invisible if it's blended well!",
+    "createdAt": "2026-03-13T12:05:00Z"
+  },
+  {
+    "id": "cmt_recipe_0007_1",
+    "userId": "user_0003_mateo",
+    "recipeId": "recipe_0007",
+    "content": "Parfait is my kind of dessert. So fresh and quick.",
+    "createdAt": "2026-03-14T08:15:00Z"
+  },
+  {
+    "id": "cmt_recipe_0007_2",
+    "userId": "user_0010_kira",
+    "recipeId": "recipe_0007",
+    "content": "I used extra berries and it tasted like summer.",
+    "createdAt": "2026-03-14T10:50:00Z"
+  },
+  {
+    "id": "cmt_recipe_0008_1",
+    "userId": "user_0005_maya",
+    "recipeId": "recipe_0008",
+    "content": "Smoky, spicy, and ridiculously crunchy. Made a double batch.",
+    "createdAt": "2026-03-15T13:25:00Z"
+  },
+  {
+    "id": "cmt_recipe_0008_2",
+    "userId": "user_0009_leila",
+    "recipeId": "recipe_0008",
+    "content": "Turned out better than I expected. Perfect for movie night.",
+    "createdAt": "2026-03-15T15:05:00Z"
+  }
+]

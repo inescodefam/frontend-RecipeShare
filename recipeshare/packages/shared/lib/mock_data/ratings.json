@@ -1,0 +1,46 @@
+[
+  { "id": "rating_recipe_0001_user_0002_jess", "userId": "user_0002_jess", "recipeId": "recipe_0001", "stars": 5, "createdAt": "2026-03-03T11:30:00Z" },
+  { "id": "rating_recipe_0001_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0001", "stars": 4, "createdAt": "2026-03-03T12:15:00Z" },
+
+  { "id": "rating_recipe_0002_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0002", "stars": 5, "createdAt": "2026-03-03T13:10:00Z" },
+  { "id": "rating_recipe_0002_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0002", "stars": 5, "createdAt": "2026-03-03T14:20:00Z" },
+
+  { "id": "rating_recipe_0003_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0003", "stars": 4, "createdAt": "2026-03-05T10:45:00Z" },
+  { "id": "rating_recipe_0003_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0003", "stars": 4, "createdAt": "2026-03-05T11:20:00Z" },
+
+  { "id": "rating_recipe_0004_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0004", "stars": 4, "createdAt": "2026-03-06T09:35:00Z" },
+  { "id": "rating_recipe_0004_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0004", "stars": 3, "createdAt": "2026-03-06T10:10:00Z" },
+
+  { "id": "rating_recipe_0005_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0005", "stars": 5, "createdAt": "2026-03-07T12:55:00Z" },
+  { "id": "rating_recipe_0005_user_0007_sam", "userId": "user_0007_sam", "recipeId": "recipe_0005", "stars": 5, "createdAt": "2026-03-07T13:25:00Z" },
+
+  { "id": "rating_recipe_0006_user_0007_sam", "userId": "user_0007_sam", "recipeId": "recipe_0006", "stars": 4, "createdAt": "2026-03-08T16:15:00Z" },
+  { "id": "rating_recipe_0006_user_0008_tom", "userId": "user_0008_tom", "recipeId": "recipe_0006", "stars": 5, "createdAt": "2026-03-08T16:45:00Z" },
+
+  { "id": "rating_recipe_0007_user_0008_tom", "userId": "user_0008_tom", "recipeId": "recipe_0007", "stars": 4, "createdAt": "2026-03-09T09:00:00Z" },
+  { "id": "rating_recipe_0007_user_0009_leila", "userId": "user_0009_leila", "recipeId": "recipe_0007", "stars": 3, "createdAt": "2026-03-09T09:35:00Z" },
+
+  { "id": "rating_recipe_0008_user_0009_leila", "userId": "user_0009_leila", "recipeId": "recipe_0008", "stars": 5, "createdAt": "2026-03-10T15:25:00Z" },
+  { "id": "rating_recipe_0008_user_0010_kira", "userId": "user_0010_kira", "recipeId": "recipe_0008", "stars": 4, "createdAt": "2026-03-10T15:55:00Z" },
+
+  { "id": "rating_recipe_0009_user_0010_kira", "userId": "user_0010_kira", "recipeId": "recipe_0009", "stars": 4, "createdAt": "2026-03-11T10:35:00Z" },
+  { "id": "rating_recipe_0009_user_0001_admin", "userId": "user_0001_admin", "recipeId": "recipe_0009", "stars": 4, "createdAt": "2026-03-11T11:05:00Z" },
+
+  { "id": "rating_recipe_0010_user_0001_admin", "userId": "user_0001_admin", "recipeId": "recipe_0010", "stars": 5, "createdAt": "2026-03-12T09:25:00Z" },
+  { "id": "rating_recipe_0010_user_0002_jess", "userId": "user_0002_jess", "recipeId": "recipe_0010", "stars": 4, "createdAt": "2026-03-12T09:55:00Z" },
+
+  { "id": "rating_recipe_0011_user_0002_jess", "userId": "user_0002_jess", "recipeId": "recipe_0011", "stars": 4, "createdAt": "2026-03-13T13:40:00Z" },
+  { "id": "rating_recipe_0011_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0011", "stars": 3, "createdAt": "2026-03-13T14:00:00Z" },
+
+  { "id": "rating_recipe_0012_user_0003_mateo", "userId": "user_0003_mateo", "recipeId": "recipe_0012", "stars": 5, "createdAt": "2026-03-14T11:20:00Z" },
+  { "id": "rating_recipe_0012_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0012", "stars": 4, "createdAt": "2026-03-14T11:45:00Z" },
+
+  { "id": "rating_recipe_0013_user_0004_aria", "userId": "user_0004_aria", "recipeId": "recipe_0013", "stars": 5, "createdAt": "2026-03-15T07:15:00Z" },
+  { "id": "rating_recipe_0013_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0013", "stars": 5, "createdAt": "2026-03-15T07:45:00Z" },
+
+  { "id": "rating_recipe_0014_user_0005_maya", "userId": "user_0005_maya", "recipeId": "recipe_0014", "stars": 4, "createdAt": "2026-03-16T09:40:00Z" },
+  { "id": "rating_recipe_0014_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0014", "stars": 4, "createdAt": "2026-03-16T10:05:00Z" },
+
+  { "id": "rating_recipe_0015_user_0006_noah", "userId": "user_0006_noah", "recipeId": "recipe_0015", "stars": 4, "createdAt": "2026-03-16T15:30:00Z" },
+  { "id": "rating_recipe_0015_user_0007_sam", "userId": "user_0007_sam", "recipeId": "recipe_0015", "stars": 5, "createdAt": "2026-03-16T16:00:00Z" }
+]

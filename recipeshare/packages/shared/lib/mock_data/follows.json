@@ -1,0 +1,35 @@
+[
+  { "followerId": "user_0002_jess", "followingId": "user_0001_admin", "createdAt": "2026-02-20T10:00:00Z" },
+  { "followerId": "user_0002_jess", "followingId": "user_0005_maya", "createdAt": "2026-02-22T12:30:00Z" },
+  { "followerId": "user_0002_jess", "followingId": "user_0007_sam", "createdAt": "2026-02-24T09:15:00Z" },
+  { "followerId": "user_0002_jess", "followingId": "user_0008_tom", "createdAt": "2026-02-25T16:05:00Z" },
+  { "followerId": "user_0002_jess", "followingId": "user_0004_aria", "createdAt": "2026-02-26T11:00:00Z" },
+
+  { "followerId": "user_0004_aria", "followingId": "user_0003_mateo", "createdAt": "2026-02-21T08:40:00Z" },
+  { "followerId": "user_0004_aria", "followingId": "user_0002_jess", "createdAt": "2026-02-23T14:10:00Z" },
+  { "followerId": "user_0004_aria", "followingId": "user_0006_noah", "createdAt": "2026-02-27T13:05:00Z" },
+  { "followerId": "user_0004_aria", "followingId": "user_0001_admin", "createdAt": "2026-02-28T09:20:00Z" },
+
+  { "followerId": "user_0003_mateo", "followingId": "user_0004_aria", "createdAt": "2026-02-21T18:25:00Z" },
+  { "followerId": "user_0003_mateo", "followingId": "user_0007_sam", "createdAt": "2026-02-24T19:40:00Z" },
+  { "followerId": "user_0003_mateo", "followingId": "user_0009_leila", "createdAt": "2026-02-25T08:05:00Z" },
+
+  { "followerId": "user_0008_tom", "followingId": "user_0001_admin", "createdAt": "2026-02-18T15:30:00Z" },
+  { "followerId": "user_0008_tom", "followingId": "user_0002_jess", "createdAt": "2026-02-19T10:20:00Z" },
+  { "followerId": "user_0008_tom", "followingId": "user_0010_kira", "createdAt": "2026-02-20T17:10:00Z" },
+  { "followerId": "user_0008_tom", "followingId": "user_0004_aria", "createdAt": "2026-02-23T12:00:00Z" },
+
+  { "followerId": "user_0007_sam", "followingId": "user_0005_maya", "createdAt": "2026-02-21T09:45:00Z" },
+  { "followerId": "user_0007_sam", "followingId": "user_0002_jess", "createdAt": "2026-02-22T20:10:00Z" },
+  { "followerId": "user_0007_sam", "followingId": "user_0006_noah", "createdAt": "2026-02-26T07:05:00Z" },
+
+  { "followerId": "user_0009_leila", "followingId": "user_0008_tom", "createdAt": "2026-02-17T13:10:00Z" },
+  { "followerId": "user_0009_leila", "followingId": "user_0003_mateo", "createdAt": "2026-02-27T18:30:00Z" },
+  { "followerId": "user_0010_kira", "followingId": "user_0004_aria", "createdAt": "2026-02-20T08:05:00Z" },
+  { "followerId": "user_0010_kira", "followingId": "user_0006_noah", "createdAt": "2026-02-28T12:40:00Z" },
+  { "followerId": "user_0010_kira", "followingId": "user_0009_leila", "createdAt": "2026-03-01T09:25:00Z" },
+
+  { "followerId": "user_0005_maya", "followingId": "user_0002_jess", "createdAt": "2026-02-19T09:55:00Z" },
+  { "followerId": "user_0005_maya", "followingId": "user_0001_admin", "createdAt": "2026-02-23T06:10:00Z" },
+  { "followerId": "user_0005_maya", "followingId": "user_0008_tom", "createdAt": "2026-02-27T10:50:00Z" }
+]

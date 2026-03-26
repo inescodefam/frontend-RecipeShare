@@ -1,0 +1,10 @@
+[
+  {"id":"tag_vegan","name":"Vegan","type":"tag","recipeCount":4},
+  {"id":"tag_quick","name":"Quick","type":"tag","recipeCount":5},
+  {"id":"tag_healthy","name":"Healthy","type":"tag","recipeCount":6},
+  {"id":"tag_italian","name":"Italian","type":"tag","recipeCount":2},
+  {"id":"tag_spicy","name":"Spicy","type":"tag","recipeCount":3},
+  {"id":"tag_gluten_free","name":"Gluten-Free","type":"tag","recipeCount":4},
+  {"id":"tag_low_calorie","name":"Low-Calorie","type":"tag","recipeCount":4},
+  {"id":"tag_budget","name":"Budget","type":"tag","recipeCount":3}
+]

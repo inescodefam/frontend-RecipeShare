@@ -1,0 +1,8 @@
+[
+  {"id":"cat_breakfast","name":"Breakfast","type":"category","recipeCount":3},
+  {"id":"cat_lunch","name":"Lunch","type":"category","recipeCount":2},
+  {"id":"cat_dinner","name":"Dinner","type":"category","recipeCount":5},
+  {"id":"cat_dessert","name":"Dessert","type":"category","recipeCount":3},
+  {"id":"cat_snack","name":"Snack","type":"category","recipeCount":1},
+  {"id":"cat_drink","name":"Drink","type":"category","recipeCount":1}
+]

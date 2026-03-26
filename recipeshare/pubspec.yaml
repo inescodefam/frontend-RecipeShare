@@ -1,0 +1,8 @@
+# Monorepo root — run `flutter pub get` inside `apps/mobile`, `apps/admin`,
+# and `packages/shared` (path deps link apps → shared).
+name: recipeshare
+publish_to: none
+description: RecipeShare Flutter monorepo (mobile + admin + shared package).
+
+environment:
+  sdk: ^3.5.0
