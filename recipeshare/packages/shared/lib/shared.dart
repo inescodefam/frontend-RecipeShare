@@ -19,3 +19,7 @@ export 'services/mock/mock_comment_service.dart';
 export 'services/mock/mock_collection_service.dart';
 export 'services/mock/mock_report_service.dart';
 export 'services/mock/mock_admin_service.dart';
+
+export 'theme/app_colors.dart';
+export 'theme/app_theme.dart';
+export 'widgets/widgets.dart';
