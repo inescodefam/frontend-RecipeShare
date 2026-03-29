@@ -46,6 +46,28 @@ class Report {
     );
   }
 
+  Report copyWith({
+    String? id,
+    String? reporterUserId,
+    ReportTargetType? targetType,
+    String? targetId,
+    ReportReason? reason,
+    String? description,
+    ReportStatus? status,
+    DateTime? createdAt,
+  }) {
+    return Report(
+      id: id ?? this.id,
+      reporterUserId: reporterUserId ?? this.reporterUserId,
+      targetType: targetType ?? this.targetType,
+      targetId: targetId ?? this.targetId,
+      reason: reason ?? this.reason,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

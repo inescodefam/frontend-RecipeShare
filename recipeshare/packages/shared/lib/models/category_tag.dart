@@ -26,6 +26,20 @@ class CategoryTag {
     );
   }
 
+  CategoryTag copyWith({
+    String? id,
+    String? name,
+    CategoryTagType? type,
+    int? recipeCount,
+  }) {
+    return CategoryTag(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      recipeCount: recipeCount ?? this.recipeCount,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -71,6 +71,47 @@ class Recipe {
     );
   }
 
+  /// Used by mock services when likes/ratings/feature flags change in memory.
+  Recipe copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? description,
+    String? photoUrl,
+    int? prepTime,
+    int? cookTime,
+    int? servings,
+    Difficulty? difficulty,
+    String? categoryId,
+    List<String>? tagIds,
+    bool? isFeature,
+    int? likesCount,
+    double? averageRating,
+    DateTime? createdAt,
+    List<Ingredient>? ingredients,
+    List<RecipeStep>? steps,
+  }) {
+    return Recipe(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      photoUrl: photoUrl ?? this.photoUrl,
+      prepTime: prepTime ?? this.prepTime,
+      cookTime: cookTime ?? this.cookTime,
+      servings: servings ?? this.servings,
+      difficulty: difficulty ?? this.difficulty,
+      categoryId: categoryId ?? this.categoryId,
+      tagIds: tagIds ?? this.tagIds,
+      isFeature: isFeature ?? this.isFeature,
+      likesCount: likesCount ?? this.likesCount,
+      averageRating: averageRating ?? this.averageRating,
+      createdAt: createdAt ?? this.createdAt,
+      ingredients: ingredients ?? this.ingredients,
+      steps: steps ?? this.steps,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

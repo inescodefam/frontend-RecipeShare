@@ -41,6 +41,34 @@ class User {
     );
   }
 
+  User copyWith({
+    String? id,
+    String? username,
+    String? email,
+    String? passwordHash,
+    String? bio,
+    String? profileImageUrl,
+    bool? isBlocked,
+    bool? isAdmin,
+    int? followersCount,
+    int? followingCount,
+    int? recipesCount,
+  }) {
+    return User(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      passwordHash: passwordHash ?? this.passwordHash,
+      bio: bio ?? this.bio,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      isBlocked: isBlocked ?? this.isBlocked,
+      isAdmin: isAdmin ?? this.isAdmin,
+      followersCount: followersCount ?? this.followersCount,
+      followingCount: followingCount ?? this.followingCount,
+      recipesCount: recipesCount ?? this.recipesCount,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
