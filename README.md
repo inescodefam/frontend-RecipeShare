@@ -1,0 +1,1 @@
+RecipeShare is a Flutter monorepo containing a mobile app and an admin panel for a recipe sharing platform. Users can browse, create, and interact with recipes. Built with a shared package architecture and designed to connect to a REST API backend.
