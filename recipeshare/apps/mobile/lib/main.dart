@@ -1,28 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:shared/shared.dart';
+
+import 'providers/auth_provider.dart';
+import 'router/app_router.dart';
 
 /// Entry point for the RecipeShare **mobile** app (iOS & Android).
-/// Screens, routing, and providers will live under `lib/` as we build out the app.
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const RecipeShareMobileApp());
+
+  final services = RecipeShareServices.mock();
+  final auth = AuthProvider(services.auth);
+  final GoRouter router = AppRouter.create(auth);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<RecipeShareServices>.value(value: services),
+        ChangeNotifierProvider<AuthProvider>.value(value: auth),
+      ],
+      child: RecipeShareMobileApp(router: router),
+    ),
+  );
 }
 
 class RecipeShareMobileApp extends StatelessWidget {
-  const RecipeShareMobileApp({super.key});
+  const RecipeShareMobileApp({super.key, required this.router});
+
+  final GoRouter router;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'RecipeShare',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE8652A)),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('RecipeShare Mobile — project scaffold'),
-        ),
-      ),
+      theme: AppTheme.light,
+      routerConfig: router,
     );
   }
 }
