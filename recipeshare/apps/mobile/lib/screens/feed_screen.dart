@@ -84,7 +84,7 @@ class _FeedScreenState extends State<FeedScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 0.72,
+              childAspectRatio: 0.62,
             ),
             itemBuilder: (context, index) {
               final recipe = vm.recipes[index];
