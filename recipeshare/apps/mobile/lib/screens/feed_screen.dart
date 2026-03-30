@@ -94,9 +94,7 @@ class _FeedScreenState extends State<FeedScreen> {
                 recipe: recipe,
                 authorUsername: author?.username,
                 authorAvatarUrl: author?.profileImageUrl,
-                variant: recipe.isFeature
-                    ? RecipeCardVariant.featured
-                    : RecipeCardVariant.standard,
+                variant: RecipeCardVariant.standard,
                 onTap: () => context.push('/recipes/${recipe.id}'),
               );
             },

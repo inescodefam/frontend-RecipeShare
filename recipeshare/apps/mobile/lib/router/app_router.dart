@@ -87,7 +87,9 @@ class AppRouter {
         GoRoute(
           path: '/recipes/:id',
           name: 'recipeDetail',
-          builder: (context, state) => const RecipeDetailScreen(),
+          builder: (context, state) => RecipeDetailScreen(
+            recipeId: state.pathParameters['id'] ?? '',
+          ),
         ),
       ],
     );

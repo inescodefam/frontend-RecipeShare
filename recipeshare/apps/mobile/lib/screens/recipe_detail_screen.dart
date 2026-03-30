@@ -7,7 +7,12 @@ import 'package:shared/shared.dart';
 import '../providers/auth_provider.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
-  const RecipeDetailScreen({super.key});
+  const RecipeDetailScreen({
+    super.key,
+    required this.recipeId,
+  });
+
+  final String recipeId;
 
   @override
   State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
@@ -23,8 +28,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   }
 
   Future<_DetailVm> _load() async {
-    final id = GoRouterState.of(context).pathParameters['id'];
-    if (id == null || id.isEmpty) {
+    final id = widget.recipeId;
+    if (id.isEmpty) {
       throw StateError('Missing recipe id');
     }
 
@@ -43,7 +48,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final recipeId = GoRouterState.of(context).pathParameters['id'] ?? '';
+    final recipeId = widget.recipeId;
 
     return FutureBuilder<_DetailVm>(
       future: _future,
