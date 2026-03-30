@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     await auth.login(_email.text, _password.text);
     if (!mounted) return;
     if (auth.isLoggedIn) {
-      context.go('/home');
+      context.go('/home/feed');
     } else if (auth.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(auth.errorMessage!)),

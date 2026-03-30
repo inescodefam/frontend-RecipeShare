@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _bootTimer;
+
   @override
   void initState() {
     super.initState();
@@ -23,10 +27,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _boot() async {
     await context.read<AuthProvider>().init();
-    await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
-    final auth = context.read<AuthProvider>();
-    context.go(auth.isLoggedIn ? '/home' : '/login');
+
+    _bootTimer?.cancel();
+    _bootTimer = Timer(const Duration(milliseconds: 700), () {
+      if (!mounted) return;
+      final auth = context.read<AuthProvider>();
+      context.go(auth.isLoggedIn ? '/home/feed' : '/login');
+    });
+  }
+
+  @override
+  void dispose() {
+    _bootTimer?.cancel();
+    super.dispose();
   }
 
   @override
