@@ -64,14 +64,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+            child: AutofillGroup(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 AppTextField(
                   controller: _username,
                   label: 'Username',
                   textInputAction: TextInputAction.next,
-                  autofillHints: const [AutofillHints.username],
+                  autofillHints: null,
+                  autocorrect: false,
+                  enableSuggestions: false,
                   validator: (v) {
                     if (v == null || v.trim().length < 2) {
                       return 'Username must be at least 2 characters';
@@ -85,7 +88,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: 'Email',
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  autofillHints: const [AutofillHints.email],
+                  autofillHints: null,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  forceShowSoftKeyboardOnTap: true,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Enter your email';
                     if (!_looksLikeEmail(v)) return 'Enter a valid email';
@@ -136,7 +142,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: auth.isLoading ? null : () => context.pop(),
                   child: const Text('Already have an account? Sign in'),
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

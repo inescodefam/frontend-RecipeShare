@@ -89,7 +89,6 @@ class _FeedScreenState extends State<FeedScreen> {
             itemBuilder: (context, index) {
               final recipe = vm.recipes[index];
               final author = vm.authorsById[recipe.userId];
-
               return RecipeCard(
                 recipe: recipe,
                 authorUsername: author?.username,

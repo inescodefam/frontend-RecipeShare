@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_colors.dart';
 
@@ -18,6 +19,9 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.enabled = true,
+    this.forceShowSoftKeyboardOnTap = false,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
   });
 
   final TextEditingController? controller;
@@ -32,6 +36,9 @@ class AppTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final bool enabled;
+  final bool forceShowSoftKeyboardOnTap;
+  final bool autocorrect;
+  final bool enableSuggestions;
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +47,15 @@ class AppTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      autocorrect: autocorrect,
+      enableSuggestions: enableSuggestions,
       validator: validator,
       onChanged: onChanged,
       autofillHints: autofillHints,
       enabled: enabled,
+      onTap: forceShowSoftKeyboardOnTap
+          ? () => SystemChannels.textInput.invokeMethod<void>('TextInput.show')
+          : null,
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary),
       decoration: InputDecoration(
         labelText: label,
