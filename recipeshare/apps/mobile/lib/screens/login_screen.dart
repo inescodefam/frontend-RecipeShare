@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     await auth.login(_email.text, _password.text);
     if (!mounted) return;
     if (auth.isLoggedIn) {
-      context.go('/home');
+      context.go('/home/feed');
     } else if (auth.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(auth.errorMessage!)),
@@ -57,9 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+            child: AutofillGroup(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 Text(
                   'Welcome back',
                   style: Theme.of(context).textTheme.headlineSmall,
@@ -77,7 +78,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: 'Email',
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  autofillHints: const [AutofillHints.email],
+                  autofillHints: null,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  forceShowSoftKeyboardOnTap: true,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Enter your email';
                     if (!_looksLikeEmail(v)) return 'Enter a valid email';
@@ -117,7 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       : () => context.push('/register'),
                   child: const Text('Create an account'),
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
