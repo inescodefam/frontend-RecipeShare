@@ -82,10 +82,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         autofillHints: null,
-                        autocorrect: false,
-                        enableSuggestions: false,
+                        // autocorrect: false,
+                        // enableSuggestions: false,
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) return 'Enter your email';
+                          if (v == null || v.trim().isEmpty)
+                            return 'Enter your email';
                           if (!_looksLikeEmail(v)) return 'Enter a valid email';
                           return null;
                         },
@@ -99,7 +100,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         autofillHints: const [AutofillHints.password],
                         onChanged: (_) => auth.clearError(),
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Enter your password';
+                          if (v == null || v.isEmpty)
+                            return 'Enter your password';
                           return null;
                         },
                       ),
@@ -118,7 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextButton(
-                        onPressed: auth.isLoading ? null : () => context.push('/register'),
+                        onPressed: auth.isLoading
+                            ? null
+                            : () => context.push('/register'),
                         child: const Text('Create an account'),
                       ),
                     ],

@@ -76,8 +76,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         label: 'Username',
                         textInputAction: TextInputAction.next,
                         autofillHints: null,
-                        autocorrect: false,
-                        enableSuggestions: false,
+                        // autocorrect: false,
+                        // enableSuggestions: false,
                         validator: (v) {
                           if (v == null || v.trim().length < 2) {
                             return 'Username must be at least 2 characters';
@@ -92,10 +92,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         autofillHints: null,
-                        autocorrect: false,
-                        enableSuggestions: false,
+                        // autocorrect: false,
+                        // enableSuggestions: false,
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) return 'Enter your email';
+                          if (v == null || v.trim().isEmpty)
+                            return 'Enter your email';
                           if (!_looksLikeEmail(v)) return 'Enter a valid email';
                           return null;
                         },
@@ -122,7 +123,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textInputAction: TextInputAction.done,
                         autofillHints: const [AutofillHints.newPassword],
                         validator: (v) {
-                          if (v != _password.text) return 'Passwords do not match';
+                          if (v != _password.text)
+                            return 'Passwords do not match';
                           return null;
                         },
                       ),
