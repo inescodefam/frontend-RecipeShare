@@ -10,3 +10,4 @@ export 'comment.dart';
 export 'collection.dart';
 export 'report.dart';
 export 'follow.dart';
+export 'admin_catalog_row.dart';

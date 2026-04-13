@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -7,15 +8,14 @@ import 'api_config.dart';
 import 'providers/auth_provider.dart';
 import 'router/app_router.dart';
 
-/// Entry point for the RecipeShare **admin** web app (Flutter Web).
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final services = useMockServices
-      ? RecipeShareServices.mock()
-      : RecipeShareServices.api(
-          DioClient.createDio(baseUrl: resolveApiBaseUrl()),
-        );
+  final useMock = useMockServices;
+  final Dio? dio =
+      useMock ? null : DioClient.createDio(baseUrl: resolveApiBaseUrl());
+  final services =
+      useMock ? RecipeShareServices.mock() : RecipeShareServices.api(dio!);
   final auth = AuthProvider(services.auth);
   final GoRouter router = AppRouter.create(auth);
 
@@ -24,6 +24,12 @@ void main() {
       providers: [
         Provider<RecipeShareServices>.value(value: services),
         ChangeNotifierProvider<AuthProvider>.value(value: auth),
+        Provider<HttpAdminCategoriesService?>.value(
+          value: dio == null ? null : HttpAdminCategoriesService(dio),
+        ),
+        Provider<HttpAdminTagsService?>.value(
+          value: dio == null ? null : HttpAdminTagsService(dio),
+        ),
       ],
       child: RecipeShareAdminApp(router: router),
     ),
