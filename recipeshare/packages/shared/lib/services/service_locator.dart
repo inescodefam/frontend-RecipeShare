@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import 'admin_service.dart';
 import 'auth_service.dart';
 import 'collection_service.dart';
@@ -5,6 +7,7 @@ import 'comment_service.dart';
 import 'recipe_service.dart';
 import 'report_service.dart';
 import 'user_service.dart';
+import 'http/http_auth_service.dart';
 import 'mock/mock_admin_service.dart';
 import 'mock/mock_auth_service.dart';
 import 'mock/mock_collection_service.dart';
@@ -14,8 +17,8 @@ import 'mock/mock_recipe_service.dart';
 import 'mock/mock_report_service.dart';
 import 'mock/mock_user_service.dart';
 
-/// Holds all app services. Use [RecipeShareServices.mock] during development;
-/// later, add [RecipeShareServices.http] that wires the same interfaces to Dio.
+/// Holds all app services. Use [RecipeShareServices.mock] for offline JSON;
+/// use [RecipeShareServices.api] for real auth + JWT (recipes still mock until API exists).
 class RecipeShareServices {
   RecipeShareServices({
     required this.data,
@@ -28,7 +31,6 @@ class RecipeShareServices {
     required this.admin,
   });
 
-  /// Shared JSON-backed store (mock). Real phase: remove or hide behind repos.
   final MockDataService data;
 
   final AuthService auth;
@@ -39,12 +41,26 @@ class RecipeShareServices {
   final ReportService reports;
   final AdminService admin;
 
-  /// Single [MockDataService] instance so likes, recipes, and auth see the same data.
   factory RecipeShareServices.mock() {
     final data = MockDataService();
     return RecipeShareServices(
       data: data,
       auth: MockAuthService(data),
+      recipes: MockRecipeService(data),
+      users: MockUserService(data),
+      comments: MockCommentService(data),
+      collections: MockCollectionService(data),
+      reports: MockReportService(data),
+      admin: MockAdminService(data),
+    );
+  }
+
+
+  factory RecipeShareServices.api(Dio dio) {
+    final data = MockDataService();
+    return RecipeShareServices(
+      data: data,
+      auth: HttpAuthService(dio),
       recipes: MockRecipeService(data),
       users: MockUserService(data),
       comments: MockCommentService(data),

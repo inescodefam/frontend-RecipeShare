@@ -11,6 +11,8 @@ export 'services/collection_service.dart';
 export 'services/report_service.dart';
 export 'services/admin_service.dart';
 export 'services/service_locator.dart';
+export 'services/http/auth_token_storage.dart';
+export 'services/http/http_auth_service.dart';
 export 'services/mock/mock_data_service.dart';
 export 'services/mock/mock_auth_service.dart';
 export 'services/mock/mock_recipe_service.dart';
