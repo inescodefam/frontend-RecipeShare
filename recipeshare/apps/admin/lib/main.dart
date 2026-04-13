@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
+import 'api_config.dart';
 import 'providers/auth_provider.dart';
 import 'router/app_router.dart';
 
@@ -10,7 +11,11 @@ import 'router/app_router.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final services = RecipeShareServices.mock();
+  final services = useMockServices
+      ? RecipeShareServices.mock()
+      : RecipeShareServices.api(
+          DioClient.createDio(baseUrl: resolveApiBaseUrl()),
+        );
   final auth = AuthProvider(services.auth);
   final GoRouter router = AppRouter.create(auth);
 
