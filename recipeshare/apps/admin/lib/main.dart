@@ -12,10 +12,19 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   final useMock = useMockServices;
-  final Dio? dio =
-      useMock ? null : DioClient.createDio(baseUrl: resolveApiBaseUrl());
-  final services =
-      useMock ? RecipeShareServices.mock() : RecipeShareServices.api(dio!);
+  final RecipeShareServices services;
+  final Dio? dio;
+  if (useMock) {
+    services = RecipeShareServices.mock();
+    dio = null;
+  } else {
+    final session = createAuthSessionStorage();
+    dio = DioClient.createDio(
+      baseUrl: resolveApiBaseUrl(),
+      session: session,
+    );
+    services = RecipeShareServices.api(dio, session);
+  }
   final auth = AuthProvider(services.auth);
   final GoRouter router = AppRouter.create(auth);
 

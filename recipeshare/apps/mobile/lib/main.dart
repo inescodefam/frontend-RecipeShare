@@ -7,15 +7,20 @@ import 'api_config.dart';
 import 'providers/auth_provider.dart';
 import 'router/app_router.dart';
 
-/// Entry point for the RecipeShare **mobile** app (iOS & Android).
+/// Entry point for the RecipeShare mob app
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   final services = useMockServices
       ? RecipeShareServices.mock()
-      : RecipeShareServices.api(
-          DioClient.createDio(baseUrl: resolveApiBaseUrl()),
-        );
+      : () {
+          final session = createAuthSessionStorage();
+          final dio = DioClient.createDio(
+            baseUrl: resolveApiBaseUrl(),
+            session: session,
+          );
+          return RecipeShareServices.api(dio, session);
+        }();
   final auth = AuthProvider(services.auth);
   final GoRouter router = AppRouter.create(auth);
 

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'admin_service.dart';
+import 'http/auth_session_storage.dart';
 import 'auth_service.dart';
 import 'collection_service.dart';
 import 'comment_service.dart';
@@ -17,8 +18,6 @@ import 'mock/mock_recipe_service.dart';
 import 'mock/mock_report_service.dart';
 import 'mock/mock_user_service.dart';
 
-/// Holds all app services. Use [RecipeShareServices.mock] for offline JSON;
-/// use [RecipeShareServices.api] for real auth + JWT (recipes still mock until API exists).
 class RecipeShareServices {
   RecipeShareServices({
     required this.data,
@@ -56,11 +55,11 @@ class RecipeShareServices {
   }
 
 
-  factory RecipeShareServices.api(Dio dio) {
+  factory RecipeShareServices.api(Dio dio, AuthSessionStorage session) {
     final data = MockDataService();
     return RecipeShareServices(
       data: data,
-      auth: HttpAuthService(dio),
+      auth: HttpAuthService(dio, session: session),
       recipes: MockRecipeService(data),
       users: MockUserService(data),
       comments: MockCommentService(data),

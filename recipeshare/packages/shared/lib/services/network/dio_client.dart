@@ -1,17 +1,15 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../http/auth_token_storage.dart';
+import '../http/auth_session_storage.dart';
 
-/// HTTP client for the RecipeShare .NET API: base URL, JWT header, timeouts.
 class DioClient {
   DioClient._();
 
   static Dio createDio({
     required String baseUrl,
-    FlutterSecureStorage? storage,
+    required AuthSessionStorage session,
   }) {
-    final secure = storage ?? const FlutterSecureStorage();
+    final storage = session;
     final dio = Dio(
       BaseOptions(
         baseUrl: baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl,
@@ -24,7 +22,7 @@ class DioClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await secure.read(key: AuthTokenStorage.jwtKey);
+          final token = await storage.read(AuthSessionKeys.jwt);
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
