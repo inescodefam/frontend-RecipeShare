@@ -78,12 +78,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         autofillHints: null,
                         // autocorrect: false,
                         // enableSuggestions: false,
-                        validator: (v) {
-                          if (v == null || v.trim().length < 2) {
-                            return 'Username must be at least 2 characters';
-                          }
-                          return null;
-                        },
+                  validator: (v) {
+                    if (v == null || v.trim().length < 3) {
+                      return 'Username must be at least 3 characters';
+                    }
+                    return null;
+                  },
                       ),
                       const SizedBox(height: 16),
                       AppTextField(

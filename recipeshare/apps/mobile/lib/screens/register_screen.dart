@@ -76,8 +76,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   autocorrect: false,
                   enableSuggestions: false,
                   validator: (v) {
-                    if (v == null || v.trim().length < 2) {
-                      return 'Username must be at least 2 characters';
+                    if (v == null || v.trim().length < 3) {
+                      return 'Username must be at least 3 characters';
                     }
                     return null;
                   },
