@@ -12,21 +12,8 @@ class AdminDashboardScreen extends StatefulWidget {
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
 }
 
-class _AdminDashboardScreenState extends State<AdminDashboardScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabs;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabs = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabs.dispose();
-    super.dispose();
-  }
+class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
+  int _navIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +25,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('RecipeShare Admin'),
-        bottom: TabBar(
-          controller: _tabs,
-          labelColor: AppColors.primary,
-          tabs: const [
-            Tab(text: 'Categories'),
-            Tab(text: 'Tags'),
-          ],
-        ),
         actions: [
           if (user != null)
             Padding(
@@ -70,11 +49,63 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       ),
       body: categoriesApi == null || tagsApi == null
           ? const _ApiRequiredMessage()
-          : TabBarView(
-              controller: _tabs,
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AdminCatalogTab(api: categoriesApi, singular: 'Category'),
-                AdminCatalogTab(api: tagsApi, singular: 'Tag'),
+                NavigationRail(
+                  backgroundColor: AppColors.surface,
+                  selectedIndex: _navIndex,
+                  indicatorColor: AppColors.primary.withValues(alpha: 0.14),
+                  selectedIconTheme: const IconThemeData(color: AppColors.primary),
+                  selectedLabelTextStyle: const TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  onDestinationSelected: (int index) {
+                    setState(() => _navIndex = index);
+                  },
+                  labelType: NavigationRailLabelType.all,
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.category_outlined),
+                      selectedIcon: Icon(Icons.category),
+                      label: Text('Categories'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.label_outline),
+                      selectedIcon: Icon(Icons.label),
+                      label: Text('Tags'),
+                    ),
+                  ],
+                ),
+                const VerticalDivider(width: 1, thickness: 1),
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final maxContentWidth = constraints.maxWidth * 8 / 12;
+                      return Align(
+                        alignment: Alignment.topCenter,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxContentWidth),
+                          child: IndexedStack(
+                            index: _navIndex,
+                            sizing: StackFit.expand,
+                            children: [
+                              AdminCatalogTab(
+                                api: categoriesApi,
+                                singular: 'Category',
+                              ),
+                              AdminCatalogTab(
+                                api: tagsApi,
+                                singular: 'Tag',
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
     );
