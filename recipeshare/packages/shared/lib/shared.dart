@@ -1,4 +1,4 @@
-/// Barrel file for the shared package - export public APIs as they are added.
+
 library shared;
 
 export 'models/models.dart';
@@ -11,7 +11,12 @@ export 'services/collection_service.dart';
 export 'services/report_service.dart';
 export 'services/admin_service.dart';
 export 'services/service_locator.dart';
-export 'services/http/auth_token_storage.dart';
+export 'services/http/admin_catalog_http.dart';
+export 'services/http/auth_session_storage.dart';
+export 'services/http/auth_session_storage_factory.dart';
+export 'services/http/dio_error_message.dart';
+export 'services/http/http_admin_categories_service.dart';
+export 'services/http/http_admin_tags_service.dart';
 export 'services/http/http_auth_service.dart';
 export 'services/mock/mock_data_service.dart';
 export 'services/mock/mock_auth_service.dart';

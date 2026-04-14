@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
-import '../screens/admin_home_screen.dart';
+import '../screens/admin_dashboard_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
 
-/// Admin web routes. Same auth rules as mobile; home is `/dashboard`.
 class AppRouter {
   AppRouter._();
 
@@ -49,7 +48,7 @@ class AppRouter {
         GoRoute(
           path: '/dashboard',
           name: 'dashboard',
-          builder: (context, state) => const AdminHomeScreen(),
+          builder: (context, state) => const AdminDashboardScreen(),
         ),
       ],
     );

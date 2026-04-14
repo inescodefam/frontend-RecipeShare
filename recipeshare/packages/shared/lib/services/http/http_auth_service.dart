@@ -1,19 +1,17 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../models/models.dart';
 import '../auth_service.dart';
-import 'auth_token_storage.dart';
-
+import 'auth_session_storage.dart';
 
 class HttpAuthService implements AuthService {
   HttpAuthService(
     this._dio, {
-    FlutterSecureStorage? storage,
-  }) : _storage = storage ?? const FlutterSecureStorage();
+    required AuthSessionStorage session,
+  }) : _session = session;
 
   final Dio _dio;
-  final FlutterSecureStorage _storage;
+  final AuthSessionStorage _session;
 
   static String _messageFromDio(DioException e) {
     final data = e.response?.data;
@@ -50,14 +48,14 @@ class HttpAuthService implements AuthService {
 
   @override
   Future<User?> getCurrentUser() async {
-    final jwt = await _storage.read(key: AuthTokenStorage.jwtKey);
+    final jwt = await _session.read(AuthSessionKeys.jwt);
     if (jwt == null || jwt.isEmpty) return null;
-    final email = await _storage.read(key: AuthTokenStorage.emailKey) ?? '';
+    final email = await _session.read(AuthSessionKeys.email) ?? '';
     try {
       return await _fetchProfile(email);
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        await AuthTokenStorage.clear(_storage);
+        await _session.clear();
       }
       return null;
     }
@@ -77,8 +75,7 @@ class HttpAuthService implements AuthService {
       if (token == null || refresh == null) {
         throw StateError('Invalid login response');
       }
-      await AuthTokenStorage.writeAll(
-        _storage,
+      await _session.writeSessionTokens(
         token: token,
         refreshToken: refresh,
         email: email.trim().toLowerCase(),
@@ -112,8 +109,7 @@ class HttpAuthService implements AuthService {
         throw StateError('Invalid register response');
       }
       final normalizedEmail = email.trim().toLowerCase();
-      await AuthTokenStorage.writeAll(
-        _storage,
+      await _session.writeSessionTokens(
         token: token,
         refreshToken: refresh,
         email: normalizedEmail,
@@ -126,7 +122,7 @@ class HttpAuthService implements AuthService {
 
   @override
   Future<void> logout() async {
-    final refresh = await _storage.read(key: AuthTokenStorage.refreshKey);
+    final refresh = await _session.read(AuthSessionKeys.refresh);
     if (refresh != null && refresh.isNotEmpty) {
       try {
         await _dio.post<void>(
@@ -134,9 +130,9 @@ class HttpAuthService implements AuthService {
           data: {'refreshToken': refresh},
         );
       } catch (_) {
-        // Still clear local session if server fails.
+        //  clear local session if server fails
       }
     }
-    await AuthTokenStorage.clear(_storage);
+    await _session.clear();
   }
 }
