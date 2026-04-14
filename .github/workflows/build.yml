@@ -6,11 +6,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  sonarqube:
-    name: SonarQube
+  sonarcloud:
+    name: SonarCloud
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Setup Flutter
@@ -18,11 +18,27 @@ jobs:
         with:
           flutter-version: "3.x"
           channel: "stable"
-      - name: Build
+      - name: Get dependencies (mobile)
+        working-directory: recipeshare/apps/mobile
+        run: flutter pub get
+      - name: Get dependencies (admin)
+        working-directory: recipeshare/apps/admin
+        run: flutter pub get
+      - name: Get dependencies (shared)
+        working-directory: recipeshare/packages/shared
+        run: flutter pub get
+      - name: Build mobile debug APK
+        working-directory: recipeshare/apps/mobile
         run: |
-          flutter pub get
           flutter build apk --debug
-      - name: SonarQube Scan
+      - name: Run tests with coverage (mobile)
+        working-directory: recipeshare/apps/mobile
+        run: flutter test --coverage
+      - name: Run tests with coverage (admin)
+        working-directory: recipeshare/apps/admin
+        run: flutter test --coverage
+      - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
