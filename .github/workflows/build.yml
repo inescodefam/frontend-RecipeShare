@@ -35,6 +35,7 @@ jobs:
         working-directory: recipeshare/apps/mobile
         run: flutter test --coverage
       - name: Run tests with coverage (admin)
+        if: ${{ hashFiles('recipeshare/apps/admin/test/**/*.dart') != '' }}
         working-directory: recipeshare/apps/admin
         run: flutter test --coverage
       - name: SonarCloud Scan
