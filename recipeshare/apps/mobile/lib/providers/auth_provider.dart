@@ -20,7 +20,6 @@ class AuthProvider extends ChangeNotifier {
 
   String? get errorMessage => _errorMessage;
 
-  /// Call on startup so [getCurrentUser] can restore a future session (JWT / secure storage).
   Future<void> init() async {
     _loading = true;
     _errorMessage = null;
@@ -79,6 +78,124 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     _loading = false;
     notifyListeners();
+  }
+
+  Future<void> refreshUser() async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      _user = await _auth.getCurrentUser();
+    } catch (e) {
+      _errorMessage = _messageFromError(e);
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateProfile({
+    required String username,
+    required String bio,
+  }) async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      _user = await _auth.updateProfile(
+        username: username,
+        bio: bio,
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = _messageFromError(e);
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> changeEmail({
+    required String newEmail,
+    required String currentPassword,
+  }) async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      _user = await _auth.changeEmail(
+        newEmail: newEmail,
+        currentPassword: currentPassword,
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = _messageFromError(e);
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      await _auth.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = _messageFromError(e);
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> uploadProfileImage({
+    required List<int> imageBytes,
+    String? filename,
+  }) async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      _user = await _auth.uploadProfileImage(
+        imageBytes: imageBytes,
+        filename: filename,
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = _messageFromError(e);
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> removeProfileImage() async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      _user = await _auth.removeProfileImage();
+      return true;
+    } catch (e) {
+      _errorMessage = _messageFromError(e);
+      return false;
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
   }
 
   void clearError() {

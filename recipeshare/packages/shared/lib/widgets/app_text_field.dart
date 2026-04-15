@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../theme/app_colors.dart';
 
-/// Thin wrapper around [TextFormField] with shared decoration and validation styling.
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
@@ -22,6 +21,7 @@ class AppTextField extends StatelessWidget {
     this.forceShowSoftKeyboardOnTap = false,
     this.autocorrect = true,
     this.enableSuggestions = true,
+    this.maxLines = 1,
   });
 
   final TextEditingController? controller;
@@ -39,6 +39,7 @@ class AppTextField extends StatelessWidget {
   final bool forceShowSoftKeyboardOnTap;
   final bool autocorrect;
   final bool enableSuggestions;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +48,7 @@ class AppTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      maxLines: maxLines,
       autocorrect: autocorrect,
       enableSuggestions: enableSuggestions,
       validator: validator,

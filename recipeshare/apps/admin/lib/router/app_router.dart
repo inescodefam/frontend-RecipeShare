@@ -7,46 +7,51 @@ import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
 
+const _splashPath = '/splash';
+const _loginPath = '/login';
+const _registerPath = '/register';
+const _dashboardPath = '/dashboard';
+
 class AppRouter {
   AppRouter._();
 
   static GoRouter create(AuthProvider auth) {
     return GoRouter(
-      initialLocation: '/splash',
+      initialLocation: _splashPath,
       refreshListenable: auth,
       redirect: (BuildContext context, GoRouterState state) {
         final guest = auth.user == null;
         final path = state.matchedLocation;
 
         if (guest &&
-            path != '/splash' &&
-            path != '/login' &&
-            path != '/register') {
-          return '/login';
+            path != _splashPath &&
+            path != _loginPath &&
+            path != _registerPath) {
+          return _loginPath;
         }
-        if (!guest && (path == '/login' || path == '/register')) {
-          return '/dashboard';
+        if (!guest && (path == _loginPath || path == _registerPath)) {
+          return _dashboardPath;
         }
         return null;
       },
       routes: [
         GoRoute(
-          path: '/splash',
+          path: _splashPath,
           name: 'splash',
           builder: (context, state) => const SplashScreen(),
         ),
         GoRoute(
-          path: '/login',
+          path: _loginPath,
           name: 'login',
           builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
-          path: '/register',
+          path: _registerPath,
           name: 'register',
           builder: (context, state) => const RegisterScreen(),
         ),
         GoRoute(
-          path: '/dashboard',
+          path: _dashboardPath,
           name: 'dashboard',
           builder: (context, state) => const AdminDashboardScreen(),
         ),

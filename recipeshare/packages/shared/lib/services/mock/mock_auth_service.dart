@@ -2,7 +2,6 @@ import '../auth_service.dart';
 import '../../models/models.dart';
 import 'mock_data_service.dart';
 
-/// Mock auth: any non-empty password works for existing emails; register appends a user.
 class MockAuthService implements AuthService {
   MockAuthService(this._data);
 
@@ -63,5 +62,102 @@ class MockAuthService implements AuthService {
   @override
   Future<void> logout() async {
     _session = null;
+  }
+
+  @override
+  Future<User> updateProfile({
+    required String username,
+    required String bio,
+  }) async {
+    final current = _session;
+    if (current == null) {
+      throw StateError('Not signed in');
+    }
+    final t = username.trim();
+    if (t.length < 3) {
+      throw StateError('Username must be at least 3 characters');
+    }
+    var updated = current.copyWith(
+      username: t,
+      bio: bio.trim(),
+    );
+    await _data.replaceUser(updated);
+    _session = updated;
+    return updated;
+  }
+
+  @override
+  Future<User> changeEmail({
+    required String newEmail,
+    required String currentPassword,
+  }) async {
+    final current = _session;
+    if (current == null) {
+      throw StateError('Not signed in');
+    }
+    if (currentPassword.isEmpty) {
+      throw StateError('Current password is required');
+    }
+    final t = newEmail.trim().toLowerCase();
+    if (t.isEmpty) {
+      throw StateError('Email cannot be empty');
+    }
+    final other = await _data.findUserByEmail(t);
+    if (other != null && other.id != current.id) {
+      throw StateError('Email is already in use');
+    }
+    final updated = current.copyWith(email: t);
+    await _data.replaceUser(updated);
+    _session = updated;
+    return updated;
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    if (_session == null) {
+      throw StateError('Not signed in');
+    }
+    if (currentPassword.isEmpty) {
+      throw StateError('Current password is required');
+    }
+    if (newPassword.length < 6) {
+      throw StateError('New password must be at least 6 characters');
+    }
+  }
+
+  @override
+  Future<User> uploadProfileImage({
+    required List<int> imageBytes,
+    String? filename,
+  }) async {
+    final current = _session;
+    if (current == null) {
+      throw StateError('Not signed in');
+    }
+    if (imageBytes.isEmpty) {
+      throw StateError('Image is empty');
+    }
+    final seed = '${current.id}_${imageBytes.length}_${filename ?? 'img'}';
+    final updated = current.copyWith(
+      profileImageUrl: 'https://picsum.photos/seed/$seed/400/400',
+    );
+    await _data.replaceUser(updated);
+    _session = updated;
+    return updated;
+  }
+
+  @override
+  Future<User> removeProfileImage() async {
+    final current = _session;
+    if (current == null) {
+      throw StateError('Not signed in');
+    }
+    final updated = current.copyWith(profileImageUrl: '');
+    await _data.replaceUser(updated);
+    _session = updated;
+    return updated;
   }
 }

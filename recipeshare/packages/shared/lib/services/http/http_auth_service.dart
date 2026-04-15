@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../models/models.dart';
 import '../auth_service.dart';
@@ -15,36 +18,50 @@ class HttpAuthService implements AuthService {
 
   static String _messageFromDio(DioException e) {
     final data = e.response?.data;
-    if (data is Map && data['error'] is String) {
-      return data['error'] as String;
+    if (data is String && data.trim().isNotEmpty) {
+      return data.trim();
+    }
+    if (data is Map) {
+      final map = Map<Object?, Object?>.from(data);
+      final err = map['error'];
+      if (err is String && err.isNotEmpty) return err;
+      final title = map['title'];
+      if (title is String && title.isNotEmpty) return title;
     }
     return e.message ?? 'Request failed';
   }
 
-  User _mapProfile(Map<String, dynamic> json, String email) {
+  User _mapProfile(Map<String, dynamic> json, String fallbackEmail) {
+    final rawEmail = json['email'] ?? json['Email'];
+    final emailFromApi = rawEmail is String
+        ? rawEmail.trim().toLowerCase()
+        : fallbackEmail;
     return User(
       id: '${json['id']}',
       username: json['username'] as String? ?? '',
-      email: email,
+      email: emailFromApi,
       passwordHash: '',
       bio: (json['bio'] as String?) ?? '',
       profileImageUrl: (json['profileImageUrl'] as String?) ?? '',
-      isBlocked: false,
-      isAdmin: false,
+      isBlocked: json['isBlocked'] as bool? ?? false,
+      isAdmin: json['isAdmin'] as bool? ?? false,
       followersCount: (json['followerCount'] as num?)?.toInt() ?? 0,
       followingCount: (json['followingCount'] as num?)?.toInt() ?? 0,
       recipesCount: (json['recipeCount'] as num?)?.toInt() ?? 0,
     );
   }
 
-  Future<User> _fetchProfile(String email) async {
+  Future<User> _fetchProfile(String fallbackEmail) async {
     final res = await _dio.get<Map<String, dynamic>>('/api/user');
     final data = res.data;
     if (data == null) {
       throw StateError('Empty profile response');
     }
-    return _mapProfile(data, email);
+    return _mapProfile(data, fallbackEmail);
   }
+
+  Future<String> _sessionEmail() async =>
+      (await _session.read(AuthSessionKeys.email)) ?? '';
 
   @override
   Future<User?> getCurrentUser() async {
@@ -129,10 +146,103 @@ class HttpAuthService implements AuthService {
           '/api/auth/logout',
           data: {'refreshToken': refresh},
         );
-      } catch (_) {
-        //  clear local session if server fails
+      } catch (e, stackTrace) {
+        if (kDebugMode) {
+          developer.log(
+            'Remote logout request failed; clearing local session anyway.',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
       }
     }
     await _session.clear();
+  }
+
+  @override
+  Future<User> updateProfile({
+    required String username,
+    required String bio,
+  }) async {
+    try {
+      await _dio.put<void>(
+        '/api/user',
+        data: {
+          'username': username.trim(),
+          'bio': bio.trim(),
+        },
+      );
+      return _fetchProfile(await _sessionEmail());
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
+  }
+
+  @override
+  Future<User> changeEmail({
+    required String newEmail,
+    required String currentPassword,
+  }) async {
+    try {
+      final normalized = newEmail.trim().toLowerCase();
+      await _dio.put<void>(
+        '/api/user/email',
+        data: {
+          'newEmail': normalized,
+          'currentPassword': currentPassword,
+        },
+      );
+      await _session.write(AuthSessionKeys.email, normalized);
+      return _fetchProfile(normalized);
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _dio.put<void>(
+        '/api/user/password',
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+      );
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
+  }
+
+  @override
+  Future<User> uploadProfileImage({
+    required List<int> imageBytes,
+    String? filename,
+  }) async {
+    try {
+      final form = FormData.fromMap({
+        'image': MultipartFile.fromBytes(
+          imageBytes,
+          filename: filename ?? 'avatar.jpg',
+        ),
+      });
+      await _dio.put<void>('/api/user/image', data: form);
+      return _fetchProfile(await _sessionEmail());
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
+  }
+
+  @override
+  Future<User> removeProfileImage() async {
+    try {
+      await _dio.delete<void>('/api/user/image');
+      return _fetchProfile(await _sessionEmail());
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
   }
 }
