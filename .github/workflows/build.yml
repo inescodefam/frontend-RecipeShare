@@ -1,43 +1,98 @@
 name: Build
+
 on:
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
-  sonarcloud:
-    name: SonarCloud
-    runs-on: windows-latest
+  test-coverage:
+    name: Coverage (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: mobile
+            working_directory: recipeshare/apps/mobile
+            coverage_path: recipeshare/apps/mobile/coverage/lcov.info
+          - name: admin
+            working_directory: recipeshare/apps/admin
+            coverage_path: recipeshare/apps/admin/coverage/lcov.info
+          - name: shared
+            working_directory: recipeshare/packages/shared
+            coverage_path: recipeshare/packages/shared/coverage/lcov.info
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.x"
-          channel: "stable"
-      - name: Get dependencies (mobile)
-        working-directory: recipeshare/apps/mobile
+          channel: stable
+          cache: true
+      - name: Install dependencies
+        working-directory: ${{ matrix.working_directory }}
         run: flutter pub get
-      - name: Get dependencies (admin)
-        working-directory: recipeshare/apps/admin
-        run: flutter pub get
-      - name: Get dependencies (shared)
-        working-directory: recipeshare/packages/shared
-        run: flutter pub get
-      - name: Build mobile debug APK
-        working-directory: recipeshare/apps/mobile
+      - name: Run tests with coverage
+        working-directory: ${{ matrix.working_directory }}
+        run: flutter test --coverage
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.name }}
+          path: ${{ matrix.coverage_path }}
+          if-no-files-found: error
+
+  merge-coverage:
+    name: Merge coverage
+    runs-on: ubuntu-latest
+    needs: test-coverage
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage-artifacts
+      - name: Merge and normalize lcov paths
+        shell: bash
         run: |
-          flutter build apk --debug
-      - name: Run tests with coverage (mobile)
-        working-directory: recipeshare/apps/mobile
-        run: flutter test --coverage
-      - name: Run tests with coverage (admin)
-        if: ${{ hashFiles('recipeshare/apps/admin/test/**/*.dart') != '' }}
-        working-directory: recipeshare/apps/admin
-        run: flutter test --coverage
+          set -euo pipefail
+          mkdir -p recipeshare/coverage
+          out="recipeshare/coverage/lcov.info"
+          : > "$out"
+
+          normalize() {
+            local infile="$1"
+            local prefix="$2"
+            sed -E "s#^SF:lib[\\\\/]#SF:${prefix}/lib/#" "$infile" >> "$out"
+          }
+
+          normalize "coverage-artifacts/coverage-mobile/lcov.info" "recipeshare/apps/mobile"
+          normalize "coverage-artifacts/coverage-admin/lcov.info" "recipeshare/apps/admin"
+          normalize "coverage-artifacts/coverage-shared/lcov.info" "recipeshare/packages/shared"
+      - name: Upload merged coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-merged
+          path: recipeshare/coverage/lcov.info
+          if-no-files-found: error
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: merge-coverage
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Download merged coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-merged
+          path: recipeshare/coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
