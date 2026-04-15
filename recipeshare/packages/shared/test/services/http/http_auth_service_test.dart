@@ -162,5 +162,105 @@ void main() {
       expect(session.values, isEmpty);
       expect(session.clearCalls, 1);
     });
+
+    test('register/update/changePassword/upload/remove success paths', () async {
+      final session = _MemorySessionStorage()
+        ..values[AuthSessionKeys.email] = 'seed@example.com';
+      final dio = _stubbedDio((req) async {
+        if (req.method == 'POST' && req.path == '/api/auth/register') {
+          return _jsonResponse(req, {'token': 'jwt-2', 'refreshToken': 'refresh-2'});
+        }
+        if (req.method == 'PUT' && req.path == '/api/user') {
+          return _jsonResponse(req, null);
+        }
+        if (req.method == 'PUT' && req.path == '/api/user/password') {
+          return _jsonResponse(req, null);
+        }
+        if (req.method == 'PUT' && req.path == '/api/user/image') {
+          return _jsonResponse(req, null);
+        }
+        if (req.method == 'DELETE' && req.path == '/api/user/image') {
+          return _jsonResponse(req, null);
+        }
+        if (req.method == 'GET' && req.path == '/api/user') {
+          return _jsonResponse(req, {
+            'id': '5',
+            'username': 'Updated',
+            'email': 'updated@example.com',
+            'bio': 'bio',
+            'profileImageUrl': '',
+            'isBlocked': false,
+            'isAdmin': false,
+            'followerCount': 0,
+            'followingCount': 0,
+            'recipeCount': 0,
+          });
+        }
+        throw StateError('Unexpected request ${req.method} ${req.path}');
+      });
+
+      final service = HttpAuthService(dio, session: session);
+      final reg = await service.register(
+        username: 'User',
+        email: 'USER@example.com',
+        password: 'secret1',
+      );
+      expect(reg.username, 'Updated');
+      expect(session.values[AuthSessionKeys.jwt], 'jwt-2');
+
+      final updated = await service.updateProfile(username: 'Neo', bio: 'hello');
+      expect(updated.username, 'Updated');
+
+      await service.changePassword(currentPassword: 'old', newPassword: 'new123');
+
+      final withImage = await service.uploadProfileImage(
+        imageBytes: const [1, 2, 3],
+        filename: 'avatar.jpg',
+      );
+      expect(withImage.username, 'Updated');
+
+      final noImage = await service.removeProfileImage();
+      expect(noImage.username, 'Updated');
+    });
+
+    test('maps dio errors to state errors across API methods', () async {
+      final session = _MemorySessionStorage();
+      final dio = _stubbedDio((req) async {
+        throw DioException(
+          requestOptions: req,
+          response: _jsonResponse(req, {'title': 'Boom title'}, statusCode: 400),
+        );
+      });
+      final service = HttpAuthService(dio, session: session);
+
+      await expectLater(
+        () => service.login(email: 'a@b.com', password: 'pw'),
+        throwsA(isA<StateError>()),
+      );
+      await expectLater(
+        () => service.register(username: 'u', email: 'a@b.com', password: 'pw1234'),
+        throwsA(isA<StateError>()),
+      );
+      await expectLater(
+        () => service.updateProfile(username: 'u', bio: 'b'),
+        throwsA(isA<StateError>()),
+      );
+      await expectLater(
+        () => service.changeEmail(newEmail: 'x@y.com', currentPassword: 'pw'),
+        throwsA(isA<StateError>()),
+      );
+      await expectLater(
+        () => service.changePassword(currentPassword: 'old', newPassword: 'new'),
+        throwsA(isA<StateError>()),
+      );
+      await expectLater(
+        () => service.uploadProfileImage(imageBytes: const [1], filename: 'x.png'),
+        throwsA(isA<StateError>()),
+      );
+      await expectLater(
+        () => service.removeProfileImage(),
+        throwsA(isA<StateError>()),
+      );
+    });
   });
 }

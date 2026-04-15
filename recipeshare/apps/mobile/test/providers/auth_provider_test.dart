@@ -251,6 +251,44 @@ void main() {
         isFalse,
       );
       expect(provider.errorMessage, 'profile fail');
+
+      service.updateProfileError = null;
+      service.changeEmailError = StateError('email fail');
+      expect(
+        await provider.changeEmail(
+          newEmail: 'x@example.com',
+          currentPassword: 'pw',
+        ),
+        isFalse,
+      );
+      expect(provider.errorMessage, 'email fail');
+
+      service.changeEmailError = null;
+      service.changePasswordError = Exception('pwd fail');
+      expect(
+        await provider.changePassword(
+          currentPassword: 'pw',
+          newPassword: '123456',
+        ),
+        isFalse,
+      );
+      expect(provider.errorMessage, contains('pwd fail'));
+
+      service.changePasswordError = null;
+      service.uploadImageError = StateError('upload fail');
+      expect(
+        await provider.uploadProfileImage(
+          imageBytes: const [7, 8, 9],
+          filename: 'b.jpg',
+        ),
+        isFalse,
+      );
+      expect(provider.errorMessage, 'upload fail');
+
+      service.uploadImageError = null;
+      service.removeImageError = StateError('remove fail');
+      expect(await provider.removeProfileImage(), isFalse);
+      expect(provider.errorMessage, 'remove fail');
     });
   });
 }
