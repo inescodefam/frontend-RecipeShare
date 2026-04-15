@@ -12,12 +12,18 @@ import '../screens/settings_screen.dart';
 import '../screens/recipe_detail_screen.dart';
 import '../screens/splash_screen.dart';
 
+const _splashPath = '/splash';
+const _loginPath = '/login';
+const _registerPath = '/register';
+const _homePath = '/home';
+const _homeFeedPath = '/home/feed';
+
 class AppRouter {
   AppRouter._();
 
   static GoRouter create(AuthProvider auth) {
     return GoRouter(
-      initialLocation: '/splash',
+      initialLocation: _splashPath,
       refreshListenable: auth,
 
       redirect: (BuildContext context, GoRouterState state) {
@@ -25,39 +31,39 @@ class AppRouter {
         final path = state.matchedLocation;
 
         if (guest &&
-            path != '/splash' &&
-            path != '/login' &&
-            path != '/register') {
-          return '/login';
+            path != _splashPath &&
+            path != _loginPath &&
+            path != _registerPath) {
+          return _loginPath;
         }
-        if (!guest && path == '/home') {
-          return '/home/feed';
+        if (!guest && path == _homePath) {
+          return _homeFeedPath;
         }
-        if (!guest && (path == '/login' || path == '/register')) {
-          return '/home/feed';
+        if (!guest && (path == _loginPath || path == _registerPath)) {
+          return _homeFeedPath;
         }
         return null;
       },
       routes: [
         GoRoute(
-          path: '/splash',
+          path: _splashPath,
           name: 'splash',
           builder: (context, state) => const SplashScreen(),
         ),
         GoRoute(
-          path: '/login',
+          path: _loginPath,
           name: 'login',
           builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
-          path: '/register',
+          path: _registerPath,
           name: 'register',
           builder: (context, state) => const RegisterScreen(),
         ),
         GoRoute(
-          path: '/home',
+          path: _homePath,
           name: 'home',
-          redirect: (context, state) => '/home/feed',
+          redirect: (context, state) => _homeFeedPath,
         ),
         ShellRoute(
           builder: (context, state, child) {
@@ -68,7 +74,7 @@ class AppRouter {
           },
           routes: [
             GoRoute(
-              path: '/home/feed',
+              path: _homeFeedPath,
               name: 'feed',
               builder: (context, state) => const FeedScreen(),
             ),
