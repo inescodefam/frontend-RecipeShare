@@ -5,7 +5,6 @@ import 'package:shared/shared.dart';
 
 import '../providers/auth_provider.dart';
 
-/// Email + password sign-in using mock users from JSON (e.g. admin@recipeshare.local).
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

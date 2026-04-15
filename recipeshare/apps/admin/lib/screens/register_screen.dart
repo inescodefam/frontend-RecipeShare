@@ -32,9 +32,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value.trim());
   }
 
+  String? _usernameValidator(String? value) {
+    if (value == null || value.trim().length < 3) {
+      return 'Username must be at least 3 characters';
+    }
+    return null;
+  }
+
+  String? _emailValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Enter your email';
+    }
+    if (!_looksLikeEmail(value)) {
+      return 'Enter a valid email';
+    }
+    return null;
+  }
+
+  String? _passwordValidator(String? value) {
+    if (value == null || value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _confirmPasswordValidator(String? value) {
+    if (value != _password.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
     final auth = context.read<AuthProvider>();
     auth.clearError();
     await auth.register(
@@ -78,12 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         autofillHints: null,
                         // autocorrect: false,
                         // enableSuggestions: false,
-                  validator: (v) {
-                    if (v == null || v.trim().length < 3) {
-                      return 'Username must be at least 3 characters';
-                    }
-                    return null;
-                  },
+                        validator: _usernameValidator,
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
@@ -94,12 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         autofillHints: null,
                         // autocorrect: false,
                         // enableSuggestions: false,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty)
-                            return 'Enter your email';
-                          if (!_looksLikeEmail(v)) return 'Enter a valid email';
-                          return null;
-                        },
+                        validator: _emailValidator,
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
@@ -108,12 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         obscureText: true,
                         textInputAction: TextInputAction.next,
                         autofillHints: const [AutofillHints.newPassword],
-                        validator: (v) {
-                          if (v == null || v.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
+                        validator: _passwordValidator,
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
@@ -122,11 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         obscureText: true,
                         textInputAction: TextInputAction.done,
                         autofillHints: const [AutofillHints.newPassword],
-                        validator: (v) {
-                          if (v != _password.text)
-                            return 'Passwords do not match';
-                          return null;
-                        },
+                        validator: _confirmPasswordValidator,
                       ),
                       if (auth.errorMessage != null) ...[
                         const SizedBox(height: 12),

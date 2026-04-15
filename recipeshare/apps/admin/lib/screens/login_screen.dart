@@ -31,7 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
     final auth = context.read<AuthProvider>();
     auth.clearError();
     await auth.login(_email.text, _password.text);
@@ -85,9 +87,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         // autocorrect: false,
                         // enableSuggestions: false,
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty)
+                          if (v == null || v.trim().isEmpty) {
                             return 'Enter your email';
-                          if (!_looksLikeEmail(v)) return 'Enter a valid email';
+                          }
+                          if (!_looksLikeEmail(v)) {
+                            return 'Enter a valid email';
+                          }
                           return null;
                         },
                       ),
@@ -100,8 +105,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         autofillHints: const [AutofillHints.password],
                         onChanged: (_) => auth.clearError(),
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Enter your password';
+                          }
                           return null;
                         },
                       ),
