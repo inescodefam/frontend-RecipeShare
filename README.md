@@ -158,3 +158,7 @@ Set backend URL there (or through the mechanism already used in that file) when 
 
 - **Web run issues**  
   Ensure Chrome is installed and visible in `flutter devices`.
+
+  ## Demo
+
+  You can enjoy demo on the [link](https://drive.google.com/drive/folders/17KHBp4zdkk1iP9_0Uq4fz3T1tmEb9qJb?usp=sharing)
