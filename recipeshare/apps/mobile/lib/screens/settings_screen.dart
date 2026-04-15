@@ -7,6 +7,29 @@ import 'package:shared/shared.dart';
 
 import '../providers/auth_provider.dart';
 
+void _showSettingsSnack(
+  BuildContext context,
+  AuthProvider auth, {
+  required bool ok,
+  required String successMessage,
+  required String failureFallback,
+}) {
+  final text = ok ? successMessage : (auth.errorMessage ?? failureFallback);
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+}
+
+const _buttonProgressIndicator = SizedBox(
+  height: 22,
+  width: 22,
+  child: CircularProgressIndicator(strokeWidth: 2),
+);
+
+const _iconProgressIndicator = SizedBox(
+  width: 18,
+  height: 18,
+  child: CircularProgressIndicator(strokeWidth: 2),
+);
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -69,12 +92,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (!mounted) return;
     setState(() => _savingProfile = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'Profile updated' : (auth.errorMessage ?? 'Could not update profile'),
-        ),
-      ),
+    _showSettingsSnack(
+      context,
+      auth,
+      ok: ok,
+      successMessage: 'Profile updated',
+      failureFallback: 'Could not update profile',
     );
   }
 
@@ -119,12 +142,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _pwdNew.clear();
       _pwdConfirm.clear();
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'Password changed' : (auth.errorMessage ?? 'Could not change password'),
-        ),
-      ),
+    _showSettingsSnack(
+      context,
+      auth,
+      ok: ok,
+      successMessage: 'Password changed',
+      failureFallback: 'Could not change password',
     );
   }
 
@@ -145,12 +168,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (!mounted) return;
     setState(() => _uploadingImage = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'Profile photo updated' : (auth.errorMessage ?? 'Upload failed'),
-        ),
-      ),
+    _showSettingsSnack(
+      context,
+      auth,
+      ok: ok,
+      successMessage: 'Profile photo updated',
+      failureFallback: 'Upload failed',
     );
   }
 
@@ -161,12 +184,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final ok = await auth.removeProfileImage();
     if (!mounted) return;
     setState(() => _removingImage = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'Profile photo removed' : (auth.errorMessage ?? 'Remove failed'),
-        ),
-      ),
+    _showSettingsSnack(
+      context,
+      auth,
+      ok: ok,
+      successMessage: 'Profile photo removed',
+      failureFallback: 'Remove failed',
     );
   }
 
@@ -234,11 +257,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ? null
                             : () => _pickAvatar(auth),
                         icon: _uploadingImage
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
+                            ? _iconProgressIndicator
                             : const Icon(Icons.photo_library_outlined),
                         label: const Text('Choose photo'),
                       ),
@@ -251,11 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ? null
                             : () => _removeAvatar(auth),
                         icon: _removingImage
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
+                            ? _iconProgressIndicator
                             : const Icon(Icons.delete_outline),
                         label: const Text('Remove photo'),
                       ),
@@ -309,11 +324,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? null
                         : () => _saveProfile(auth),
                     child: _savingProfile
-                        ? const SizedBox(
-                            height: 22,
-                            width: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                        ? _buttonProgressIndicator
                         : const Text('Save profile'),
                   ),
                 ],
@@ -372,11 +383,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? null
                         : () => _submitEmail(auth),
                     child: _savingEmail
-                        ? const SizedBox(
-                            height: 22,
-                            width: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                        ? _buttonProgressIndicator
                         : const Text('Update email'),
                   ),
                 ],
@@ -450,11 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? null
                         : () => _changePassword(auth),
                     child: _savingPassword
-                        ? const SizedBox(
-                            height: 22,
-                            width: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                        ? _buttonProgressIndicator
                         : const Text('Change password'),
                   ),
                 ],

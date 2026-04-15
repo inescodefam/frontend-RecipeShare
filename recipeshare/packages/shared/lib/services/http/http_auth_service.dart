@@ -1,4 +1,7 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../models/models.dart';
 import '../auth_service.dart';
@@ -18,11 +21,12 @@ class HttpAuthService implements AuthService {
     if (data is String && data.trim().isNotEmpty) {
       return data.trim();
     }
-    if (data is Map && data['error'] is String) {
-      return data['error'] as String;
-    }
-    if (data is Map && data['title'] is String) {
-      return data['title'] as String;
+    if (data is Map) {
+      final map = Map<Object?, Object?>.from(data);
+      final err = map['error'];
+      if (err is String && err.isNotEmpty) return err;
+      final title = map['title'];
+      if (title is String && title.isNotEmpty) return title;
     }
     return e.message ?? 'Request failed';
   }
@@ -142,7 +146,15 @@ class HttpAuthService implements AuthService {
           '/api/auth/logout',
           data: {'refreshToken': refresh},
         );
-      } catch (_) {}
+      } catch (e, stackTrace) {
+        if (kDebugMode) {
+          developer.log(
+            'Remote logout request failed; clearing local session anyway.',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }
     }
     await _session.clear();
   }
