@@ -30,6 +30,52 @@ const _iconProgressIndicator = SizedBox(
   child: CircularProgressIndicator(strokeWidth: 2),
 );
 
+abstract final class _SettingsStrings {
+  static const title = 'Account settings';
+  static const profilePhoto = 'Profile photo';
+  static const choosePhoto = 'Choose photo';
+  static const removePhoto = 'Remove photo';
+  static const profile = 'Profile';
+  static const profileHint = 'Username and bio (backend: PUT /api/user).';
+  static const username = 'Username';
+  static const bio = 'Bio';
+  static const saveProfile = 'Save profile';
+  static const email = 'Email';
+  static const emailHint =
+      'Changing email requires your current password (backend: PUT /api/user/email).';
+  static const emailPasswordLabel =
+      'Current password (to confirm email change)';
+  static const updateEmail = 'Update email';
+  static const password = 'Password';
+  static const passwordHint =
+      'Backend: PUT /api/user/password. You stay signed in; refresh tokens are rotated server-side.';
+  static const currentPassword = 'Current password';
+  static const newPassword = 'New password';
+  static const confirmPassword = 'Confirm new password';
+  static const changePassword = 'Change password';
+
+  static const msgProfileOk = 'Profile updated';
+  static const msgProfileErr = 'Could not update profile';
+  static const msgEmailOk = 'Email updated';
+  static const msgEmailErr = 'Could not update email';
+  static const msgPwdOk = 'Password changed';
+  static const msgPwdErr = 'Could not change password';
+  static const msgPhotoOk = 'Profile photo updated';
+  static const msgPhotoErr = 'Upload failed';
+  static const msgRemoveOk = 'Profile photo removed';
+  static const msgRemoveErr = 'Remove failed';
+
+  static const errUsernameShort = 'At least 3 characters';
+  static const errUsernameLong = 'At most 30 characters';
+  static const errEmailInvalid = 'Enter a valid email';
+  static const errRequired = 'Required';
+  static const errPwdShort = 'At least 6 characters';
+  static const errPwdMismatch = 'Does not match new password';
+}
+
+final RegExp _emailRegExp =
+    RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -68,9 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  bool _looksLikeEmail(String value) {
-    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value.trim());
-  }
+  bool _looksLikeEmail(String value) => _emailRegExp.hasMatch(value.trim());
 
   void _seedFromUser(AuthProvider auth) {
     final u = auth.user;
@@ -96,8 +140,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
       auth,
       ok: ok,
-      successMessage: 'Profile updated',
-      failureFallback: 'Could not update profile',
+      successMessage: _SettingsStrings.msgProfileOk,
+      failureFallback: _SettingsStrings.msgProfileErr,
     );
   }
 
@@ -117,12 +161,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final u = auth.user;
       if (u != null) _newEmail.text = u.email;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'Email updated' : (auth.errorMessage ?? 'Could not update email'),
-        ),
-      ),
+    _showSettingsSnack(
+      context,
+      auth,
+      ok: ok,
+      successMessage: _SettingsStrings.msgEmailOk,
+      failureFallback: _SettingsStrings.msgEmailErr,
     );
   }
 
@@ -146,8 +190,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
       auth,
       ok: ok,
-      successMessage: 'Password changed',
-      failureFallback: 'Could not change password',
+      successMessage: _SettingsStrings.msgPwdOk,
+      failureFallback: _SettingsStrings.msgPwdErr,
     );
   }
 
@@ -172,8 +216,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
       auth,
       ok: ok,
-      successMessage: 'Profile photo updated',
-      failureFallback: 'Upload failed',
+      successMessage: _SettingsStrings.msgPhotoOk,
+      failureFallback: _SettingsStrings.msgPhotoErr,
     );
   }
 
@@ -188,8 +232,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
       auth,
       ok: ok,
-      successMessage: 'Profile photo removed',
-      failureFallback: 'Remove failed',
+      successMessage: _SettingsStrings.msgRemoveOk,
+      failureFallback: _SettingsStrings.msgRemoveErr,
     );
   }
 
@@ -208,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Account settings'),
+        title: const Text(_SettingsStrings.title),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -218,254 +262,291 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            Text(
-              'Profile photo',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                ClipOval(
-                  child: user.profileImageUrl.isEmpty
-                      ? const CircleAvatar(
-                          radius: 44,
-                          child: Icon(Icons.person, size: 44),
-                        )
-                      : CachedNetworkImage(
-                          imageUrl: user.profileImageUrl,
-                          width: 88,
-                          height: 88,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) => const SizedBox(
-                            width: 88,
-                            height: 88,
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                          errorWidget: (_, __, ___) => const CircleAvatar(
-                            radius: 44,
-                            child: Icon(Icons.broken_image_outlined),
-                          ),
-                        ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      OutlinedButton.icon(
-                        onPressed: auth.isLoading || _uploadingImage || _removingImage
-                            ? null
-                            : () => _pickAvatar(auth),
-                        icon: _uploadingImage
-                            ? _iconProgressIndicator
-                            : const Icon(Icons.photo_library_outlined),
-                        label: const Text('Choose photo'),
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: auth.isLoading ||
-                                _uploadingImage ||
-                                _removingImage ||
-                                user.profileImageUrl.isEmpty
-                            ? null
-                            : () => _removeAvatar(auth),
-                        icon: _removingImage
-                            ? _iconProgressIndicator
-                            : const Icon(Icons.delete_outline),
-                        label: const Text('Remove photo'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            _photoSection(context, user, auth),
             const SizedBox(height: 32),
-            Text(
-              'Profile',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Username and bio (backend: PUT /api/user).',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            Form(
-              key: _formProfileKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AppTextField(
-                    controller: _username,
-                    label: 'Username',
-                    textInputAction: TextInputAction.next,
-                    validator: (v) {
-                      if (v == null || v.trim().length < 3) {
-                        return 'At least 3 characters';
-                      }
-                      if (v.trim().length > 30) {
-                        return 'At most 30 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _bio,
-                    label: 'Bio',
-                    maxLines: 3,
-                    textInputAction: TextInputAction.done,
-                  ),
-                  const SizedBox(height: 20),
-                  FilledButton(
-                    onPressed: auth.isLoading || _savingProfile
-                        ? null
-                        : () => _saveProfile(auth),
-                    child: _savingProfile
-                        ? _buttonProgressIndicator
-                        : const Text('Save profile'),
-                  ),
-                ],
-              ),
-            ),
+            _profileFormSection(context, auth),
             const SizedBox(height: 40),
-            Text(
-              'Email',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Changing email requires your current password (backend: PUT /api/user/email).',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            Form(
-              key: _formEmailKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AppTextField(
-                    controller: _newEmail,
-                    label: 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    validator: (v) {
-                      if (v == null || !_looksLikeEmail(v)) {
-                        return 'Enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _emailPassword,
-                    label: 'Current password (to confirm email change)',
-                    obscureText: true,
-                    textInputAction: TextInputAction.done,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) {
-                        return 'Required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  OutlinedButton(
-                    onPressed: auth.isLoading || _savingEmail
-                        ? null
-                        : () => _submitEmail(auth),
-                    child: _savingEmail
-                        ? _buttonProgressIndicator
-                        : const Text('Update email'),
-                  ),
-                ],
-              ),
-            ),
+            _emailFormSection(context, auth),
             const SizedBox(height: 40),
-            Text(
-              'Password',
-              style: Theme.of(context).textTheme.titleMedium,
+            _passwordFormSection(context, auth),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _photoSection(BuildContext context, User user, AuthProvider auth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _SettingsStrings.profilePhoto,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            ClipOval(
+              child: user.profileImageUrl.isEmpty
+                  ? const CircleAvatar(
+                      radius: 44,
+                      child: Icon(Icons.person, size: 44),
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: user.profileImageUrl,
+                      width: 88,
+                      height: 88,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const SizedBox(
+                        width: 88,
+                        height: 88,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const CircleAvatar(
+                        radius: 44,
+                        child: Icon(Icons.broken_image_outlined),
+                      ),
+                    ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Backend: PUT /api/user/password. You stay signed in; refresh tokens are rotated server-side.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            Form(
-              key: _formPasswordKey,
+            const SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  AppTextField(
-                    controller: _pwdCurrent,
-                    label: 'Current password',
-                    obscureText: true,
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) {
-                        return 'Required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _pwdNew,
-                    label: 'New password',
-                    obscureText: true,
-                    textInputAction: TextInputAction.next,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    validator: (v) {
-                      if (v == null || v.length < 6) {
-                        return 'At least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _pwdConfirm,
-                    label: 'Confirm new password',
-                    obscureText: true,
-                    textInputAction: TextInputAction.done,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    validator: (v) {
-                      if (v != _pwdNew.text) {
-                        return 'Does not match new password';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  OutlinedButton(
-                    onPressed: auth.isLoading || _savingPassword
+                  OutlinedButton.icon(
+                    onPressed: auth.isLoading || _uploadingImage || _removingImage
                         ? null
-                        : () => _changePassword(auth),
-                    child: _savingPassword
-                        ? _buttonProgressIndicator
-                        : const Text('Change password'),
+                        : () => _pickAvatar(auth),
+                    icon: _uploadingImage
+                        ? _iconProgressIndicator
+                        : const Icon(Icons.photo_library_outlined),
+                    label: const Text(_SettingsStrings.choosePhoto),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: auth.isLoading ||
+                            _uploadingImage ||
+                            _removingImage ||
+                            user.profileImageUrl.isEmpty
+                        ? null
+                        : () => _removeAvatar(auth),
+                    icon: _removingImage
+                        ? _iconProgressIndicator
+                        : const Icon(Icons.delete_outline),
+                    label: const Text(_SettingsStrings.removePhoto),
                   ),
                 ],
               ),
             ),
           ],
         ),
-      ),
+      ],
+    );
+  }
+
+  Widget _profileFormSection(BuildContext context, AuthProvider auth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _SettingsStrings.profile,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          _SettingsStrings.profileHint,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Form(
+          key: _formProfileKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppTextField(
+                controller: _username,
+                label: _SettingsStrings.username,
+                textInputAction: TextInputAction.next,
+                validator: (v) {
+                  if (v == null || v.trim().length < 3) {
+                    return _SettingsStrings.errUsernameShort;
+                  }
+                  if (v.trim().length > 30) {
+                    return _SettingsStrings.errUsernameLong;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _bio,
+                label: _SettingsStrings.bio,
+                maxLines: 3,
+                textInputAction: TextInputAction.done,
+              ),
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: auth.isLoading || _savingProfile
+                    ? null
+                    : () => _saveProfile(auth),
+                child: _savingProfile
+                    ? _buttonProgressIndicator
+                    : const Text(_SettingsStrings.saveProfile),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emailFormSection(BuildContext context, AuthProvider auth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _SettingsStrings.email,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          _SettingsStrings.emailHint,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Form(
+          key: _formEmailKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppTextField(
+                controller: _newEmail,
+                label: _SettingsStrings.email,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (v) {
+                  if (v == null || !_looksLikeEmail(v)) {
+                    return _SettingsStrings.errEmailInvalid;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _emailPassword,
+                label: _SettingsStrings.emailPasswordLabel,
+                obscureText: true,
+                textInputAction: TextInputAction.done,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (v) {
+                  if (v == null || v.isEmpty) {
+                    return _SettingsStrings.errRequired;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              OutlinedButton(
+                onPressed: auth.isLoading || _savingEmail
+                    ? null
+                    : () => _submitEmail(auth),
+                child: _savingEmail
+                    ? _buttonProgressIndicator
+                    : const Text(_SettingsStrings.updateEmail),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _passwordFormSection(BuildContext context, AuthProvider auth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _SettingsStrings.password,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          _SettingsStrings.passwordHint,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Form(
+          key: _formPasswordKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppTextField(
+                controller: _pwdCurrent,
+                label: _SettingsStrings.currentPassword,
+                obscureText: true,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (v) {
+                  if (v == null || v.isEmpty) {
+                    return _SettingsStrings.errRequired;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _pwdNew,
+                label: _SettingsStrings.newPassword,
+                obscureText: true,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (v) {
+                  if (v == null || v.length < 6) {
+                    return _SettingsStrings.errPwdShort;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _pwdConfirm,
+                label: _SettingsStrings.confirmPassword,
+                obscureText: true,
+                textInputAction: TextInputAction.done,
+                autocorrect: false,
+                enableSuggestions: false,
+                validator: (v) {
+                  if (v != _pwdNew.text) {
+                    return _SettingsStrings.errPwdMismatch;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              OutlinedButton(
+                onPressed: auth.isLoading || _savingPassword
+                    ? null
+                    : () => _changePassword(auth),
+                child: _savingPassword
+                    ? _buttonProgressIndicator
+                    : const Text(_SettingsStrings.changePassword),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
