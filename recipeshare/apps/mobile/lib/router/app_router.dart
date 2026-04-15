@@ -8,10 +8,10 @@ import '../screens/login_screen.dart';
 import '../screens/home_shell_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/settings_screen.dart';
 import '../screens/recipe_detail_screen.dart';
 import '../screens/splash_screen.dart';
 
-/// Central route table. Swap redirect rules when real tokens exist; screens stay the same.
 class AppRouter {
   AppRouter._();
 
@@ -81,6 +81,11 @@ class AppRouter {
               path: '/home/profile',
               name: 'profile',
               builder: (context, state) => const ProfileScreen(),
+            ),
+            GoRoute(
+              path: '/home/profile/settings',
+              name: 'profileSettings',
+              builder: (context, state) => const SettingsScreen(),
             ),
           ],
         ),

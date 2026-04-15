@@ -1,6 +1,5 @@
 import '../models/models.dart';
 
-/// Contract for sign-in and session. Real backend will call HTTP + secure storage.
 abstract class AuthService {
   Future<User?> getCurrentUser();
 
@@ -13,4 +12,26 @@ abstract class AuthService {
   });
 
   Future<void> logout();
+
+  Future<User> updateProfile({
+    required String username,
+    required String bio,
+  });
+
+  Future<User> changeEmail({
+    required String newEmail,
+    required String currentPassword,
+  });
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
+  Future<User> uploadProfileImage({
+    required List<int> imageBytes,
+    String? filename,
+  });
+
+  Future<User> removeProfileImage();
 }
