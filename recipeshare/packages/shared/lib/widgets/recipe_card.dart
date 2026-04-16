@@ -46,16 +46,22 @@ class RecipeCard extends StatelessWidget {
           children: [
             SizedBox(
               height: _imageHeight,
-              child: CachedNetworkImage(
-                imageUrl: recipe.photoUrl,
-                fit: BoxFit.cover,
-                placeholder: (_, __) => Container(color: const Color(0xFFE8E8E6)),
-                errorWidget: (_, __, ___) => Container(
-                  color: const Color(0xFFE8E8E6),
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.restaurant, size: 48, color: AppColors.textSecondary),
-                ),
-              ),
+              child: recipe.photoUrl.isEmpty
+                  ? Container(
+                      color: const Color(0xFFE8E8E6),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.restaurant, size: 48, color: AppColors.textSecondary),
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: recipe.photoUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => Container(color: const Color(0xFFE8E8E6)),
+                      errorWidget: (_, __, ___) => Container(
+                        color: const Color(0xFFE8E8E6),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.restaurant, size: 48, color: AppColors.textSecondary),
+                      ),
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -72,14 +78,15 @@ class RecipeCard extends StatelessWidget {
                   Row(
                     children: [
                       UserAvatar(
-                        imageUrl: authorAvatarUrl ?? '',
+                        imageUrl: authorAvatarUrl ?? recipe.authorAvatarUrl ?? '',
                         radius: 14,
-                        nameForInitials: authorUsername ?? '?',
+                        nameForInitials:
+                            authorUsername ?? recipe.authorUsername ?? '?',
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          authorUsername ?? 'User',
+                          authorUsername ?? recipe.authorUsername ?? 'User',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.labelLarge?.copyWith(
