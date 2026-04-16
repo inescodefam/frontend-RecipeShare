@@ -21,10 +21,24 @@ class RecipeDetailScreen extends StatefulWidget {
 class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   late Future<_DetailVm> _future;
 
+  void _goBackOrFeed() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home/feed');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _future = _load();
+  }
+
+  void _reload() {
+    setState(() {
+      _future = _load();
+    });
   }
 
   Future<_DetailVm> _load() async {
@@ -36,14 +50,68 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     final currentUserId = context.read<AuthProvider>().user?.id;
     final services = context.read<RecipeShareServices>();
     final recipe = await services.recipes.getRecipeById(id);
-    final author = await services.users.getUserById(recipe.userId);
 
-    // MVP: only display recipe details. Future steps: add like/rate/comments.
+    final User author;
+    if (recipe.authorUsername != null && recipe.authorUsername!.isNotEmpty) {
+      author = User(
+        id: recipe.userId,
+        username: recipe.authorUsername!,
+        email: '',
+        passwordHash: '',
+        bio: '',
+        profileImageUrl: recipe.authorAvatarUrl ?? '',
+        isBlocked: false,
+        isAdmin: false,
+        followersCount: 0,
+        followingCount: 0,
+        recipesCount: 0,
+      );
+    } else {
+      author = await services.users.getUserById(recipe.userId);
+    }
+
     return _DetailVm(
       recipe: recipe,
       author: author,
       currentUserId: currentUserId,
     );
+  }
+
+  Future<void> _confirmDeleteRecipe(RecipeShareServices services, String id) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete recipe?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      await services.recipes.deleteRecipe(id);
+      if (!mounted) return;
+      _goBackOrFeed();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _removeImage(RecipeShareServices services, String id) async {
+    try {
+      await services.recipes.deleteRecipeImage(id);
+      if (!mounted) return;
+      _reload();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image removed')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -57,7 +125,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
           title: const Text('Recipe'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => context.pop(),
+            onPressed: _goBackOrFeed,
           ),
         );
 
@@ -94,6 +162,9 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
         final recipe = vm.recipe;
         final author = vm.author;
+        final services = context.read<RecipeShareServices>();
+        final isOwner =
+            vm.currentUserId != null && vm.currentUserId == recipe.userId;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -101,8 +172,35 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
             title: Text(recipe.title, maxLines: 1, overflow: TextOverflow.ellipsis),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded),
-              onPressed: () => context.pop(),
+              onPressed: _goBackOrFeed,
             ),
+            actions: [
+              if (isOwner)
+                PopupMenuButton<String>(
+                  onSelected: (value) async {
+                    switch (value) {
+                      case 'edit':
+                        final changed = await context.push<bool>('/recipes/${recipe.id}/edit');
+                        if (changed == true && mounted) {
+                          _reload();
+                        }
+                        break;
+                      case 'deleteImage':
+                        await _removeImage(services, recipe.id);
+                        break;
+                      case 'deleteRecipe':
+                        await _confirmDeleteRecipe(services, recipe.id);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: 'edit', child: Text('Edit recipe')),
+                    if (recipe.photoUrl.trim().isNotEmpty)
+                      const PopupMenuItem(value: 'deleteImage', child: Text('Remove image')),
+                    const PopupMenuItem(value: 'deleteRecipe', child: Text('Delete recipe')),
+                  ],
+                ),
+            ],
           ),
           body: CustomScrollView(
             slivers: [
@@ -110,13 +208,21 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 child: SizedBox(
                   height: 260,
                   width: double.infinity,
-                  child: CachedNetworkImage(
-                    imageUrl: recipe.photoUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(color: const Color(0xFFE8E8E6)),
-                    errorWidget: (_, __, ___) =>
-                        Container(color: const Color(0xFFE8E8E6), child: const Icon(Icons.restaurant, size: 56, color: AppColors.textSecondary)),
-                  ),
+                  child: recipe.photoUrl.trim().isEmpty
+                      ? Container(
+                          color: const Color(0xFFE8E8E6),
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.restaurant, size: 56, color: AppColors.textSecondary),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: recipe.photoUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(color: const Color(0xFFE8E8E6)),
+                          errorWidget: (_, __, ___) => Container(
+                            color: const Color(0xFFE8E8E6),
+                            child: const Icon(Icons.restaurant, size: 56, color: AppColors.textSecondary),
+                          ),
+                        ),
                 ),
               ),
               SliverPadding(
@@ -209,7 +315,9 @@ class _IngredientsList extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '${ing.name} - ${ing.amount} ${ing.unit}',
+                  ing.unit.isEmpty
+                      ? '${ing.name} — ${ing.amount}'
+                      : '${ing.name} — ${ing.amount} ${ing.unit}',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),

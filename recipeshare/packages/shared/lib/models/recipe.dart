@@ -21,6 +21,13 @@ class Recipe {
   final List<Ingredient> ingredients;
   final List<RecipeStep> steps;
 
+  final String? categoryLabel;
+
+  final List<String> tagLabels;
+
+  final String? authorUsername;
+  final String? authorAvatarUrl;
+
   const Recipe({
     required this.id,
     required this.userId,
@@ -39,6 +46,10 @@ class Recipe {
     required this.createdAt,
     required this.ingredients,
     required this.steps,
+    this.categoryLabel,
+    this.tagLabels = const [],
+    this.authorUsername,
+    this.authorAvatarUrl,
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -68,10 +79,97 @@ class Recipe {
       steps: (json['steps'] as List<dynamic>)
           .map((item) => RecipeStep.fromJson(item as Map<String, dynamic>))
           .toList(),
+      categoryLabel: json['categoryLabel'] as String?,
+      tagLabels: json['tagLabels'] != null
+          ? (json['tagLabels'] as List<dynamic>).map((e) => e.toString()).toList()
+          : const [],
+      authorUsername: json['authorUsername'] as String?,
+      authorAvatarUrl: json['authorAvatarUrl'] as String?,
     );
   }
 
-  /// Used by mock services when likes/ratings/feature flags change in memory.
+  static Difficulty _difficultyFromApi(dynamic raw) {
+    if (raw is int) {
+      final i = raw.clamp(0, Difficulty.values.length - 1);
+      return Difficulty.values[i];
+    }
+    if (raw is String) {
+      final lower = raw.toLowerCase();
+      return enumFromString(Difficulty.values, lower, fallback: Difficulty.easy);
+    }
+    return Difficulty.easy;
+  }
+
+  factory Recipe.fromApiSummary(Map<String, dynamic> json) {
+    final author = json['author'] as Map<String, dynamic>?;
+    final authorId = author == null ? '0' : '${author['id']}';
+    final tags = (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const <String>[];
+    final imageUrl =
+        (json['imageUrl'] as String?) ?? (json['photoUrl'] as String?) ?? '';
+    return Recipe(
+      id: '${json['id']}',
+      userId: authorId,
+      title: json['title'] as String? ?? '',
+      description: '',
+      photoUrl: imageUrl,
+      prepTime: json['prepTimeMinutes'] as int? ?? 0,
+      cookTime: json['cookTimeMinutes'] as int? ?? 0,
+      servings: 1,
+      difficulty: _difficultyFromApi(json['difficulty']),
+      categoryId: '0',
+      tagIds: const [],
+      isFeature: json['isFeatured'] as bool? ?? false,
+      likesCount: 0,
+      averageRating: 0,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      ingredients: const [],
+      steps: const [],
+      categoryLabel: json['categoryName'] as String?,
+      tagLabels: tags,
+      authorUsername: author?['username'] as String?,
+      authorAvatarUrl: author?['profileImageUrl'] as String?,
+    );
+  }
+
+  factory Recipe.fromApiDetail(Map<String, dynamic> json) {
+    final author = json['author'] as Map<String, dynamic>?;
+    final authorId = author == null ? '0' : '${author['id']}';
+    final rid = '${json['id']}';
+    final tagNames =
+        (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const <String>[];
+    final imageUrl =
+        (json['imageUrl'] as String?) ?? (json['photoUrl'] as String?) ?? '';
+    final ingredients = (json['ingredients'] as List<dynamic>? ?? const [])
+        .map((e) => Ingredient.fromApiJson(e as Map<String, dynamic>, recipeId: rid))
+        .toList();
+    final steps = (json['steps'] as List<dynamic>? ?? const [])
+        .map((e) => RecipeStep.fromApiJson(e as Map<String, dynamic>, recipeId: rid))
+        .toList();
+    return Recipe(
+      id: rid,
+      userId: authorId,
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      photoUrl: imageUrl,
+      prepTime: json['prepTimeMinutes'] as int? ?? 0,
+      cookTime: json['cookTimeMinutes'] as int? ?? 0,
+      servings: json['servings'] as int? ?? 1,
+      difficulty: _difficultyFromApi(json['difficulty']),
+      categoryId: '${json['categoryId']}',
+      tagIds: const [],
+      isFeature: json['isFeatured'] as bool? ?? false,
+      likesCount: 0,
+      averageRating: 0,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      ingredients: ingredients,
+      steps: steps,
+      categoryLabel: json['categoryName'] as String?,
+      tagLabels: tagNames,
+      authorUsername: author?['username'] as String?,
+      authorAvatarUrl: author?['profileImageUrl'] as String?,
+    );
+  }
+
   Recipe copyWith({
     String? id,
     String? userId,
@@ -90,6 +188,10 @@ class Recipe {
     DateTime? createdAt,
     List<Ingredient>? ingredients,
     List<RecipeStep>? steps,
+    String? categoryLabel,
+    List<String>? tagLabels,
+    String? authorUsername,
+    String? authorAvatarUrl,
   }) {
     return Recipe(
       id: id ?? this.id,
@@ -109,6 +211,10 @@ class Recipe {
       createdAt: createdAt ?? this.createdAt,
       ingredients: ingredients ?? this.ingredients,
       steps: steps ?? this.steps,
+      categoryLabel: categoryLabel ?? this.categoryLabel,
+      tagLabels: tagLabels ?? this.tagLabels,
+      authorUsername: authorUsername ?? this.authorUsername,
+      authorAvatarUrl: authorAvatarUrl ?? this.authorAvatarUrl,
     );
   }
 
@@ -131,6 +237,10 @@ class Recipe {
       'createdAt': createdAt.toIso8601String(),
       'ingredients': ingredients.map((item) => item.toJson()).toList(),
       'steps': steps.map((item) => item.toJson()).toList(),
+      'categoryLabel': categoryLabel,
+      'tagLabels': tagLabels,
+      'authorUsername': authorUsername,
+      'authorAvatarUrl': authorAvatarUrl,
     };
   }
 }
