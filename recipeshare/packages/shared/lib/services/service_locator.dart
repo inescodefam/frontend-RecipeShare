@@ -9,6 +9,7 @@ import 'recipe_service.dart';
 import 'report_service.dart';
 import 'user_service.dart';
 import 'http/http_auth_service.dart';
+import 'http/http_recipe_service.dart';
 import 'mock/mock_admin_service.dart';
 import 'mock/mock_auth_service.dart';
 import 'mock/mock_collection_service.dart';
@@ -60,7 +61,7 @@ class RecipeShareServices {
     return RecipeShareServices(
       data: data,
       auth: HttpAuthService(dio, session: session),
-      recipes: MockRecipeService(data),
+      recipes: HttpRecipeService(dio),
       users: MockUserService(data),
       comments: MockCommentService(data),
       collections: MockCollectionService(data),

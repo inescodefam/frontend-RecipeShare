@@ -18,6 +18,7 @@ export 'services/http/dio_error_message.dart';
 export 'services/http/http_admin_categories_service.dart';
 export 'services/http/http_admin_tags_service.dart';
 export 'services/http/http_auth_service.dart';
+export 'services/http/http_recipe_service.dart';
 export 'services/mock/mock_data_service.dart';
 export 'services/mock/mock_auth_service.dart';
 export 'services/mock/mock_recipe_service.dart';

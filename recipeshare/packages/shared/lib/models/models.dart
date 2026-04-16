@@ -3,6 +3,7 @@ export 'ingredient.dart';
 export 'recipe_step.dart';
 export 'user.dart';
 export 'recipe.dart';
+export 'recipe_write_payload.dart';
 export 'category_tag.dart';
 export 'like.dart';
 export 'rating.dart';
