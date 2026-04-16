@@ -11,6 +11,7 @@ import '../screens/profile_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/recipe_detail_screen.dart';
 import '../screens/recipe_editor_screen.dart';
+import '../screens/user_search_screen.dart';
 import '../screens/splash_screen.dart';
 
 const _splashPath = '/splash';
@@ -94,6 +95,11 @@ class AppRouter {
               path: '/home/profile',
               name: 'profile',
               builder: (context, state) => const ProfileScreen(),
+            ),
+            GoRoute(
+              path: '/home/profile/users',
+              name: 'userSearch',
+              builder: (context, state) => const UserSearchScreen(),
             ),
             GoRoute(
               path: '/home/profile/settings',

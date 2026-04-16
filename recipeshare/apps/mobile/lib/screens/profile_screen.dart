@@ -95,6 +95,12 @@ class ProfileScreen extends StatelessWidget {
               label: const Text('Account settings'),
             ),
             const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () => context.push('/home/profile/users'),
+              icon: const Icon(Icons.group_add_outlined),
+              label: const Text('Find users'),
+            ),
+            const SizedBox(height: 12),
             Text(
               'Update your photo, username, email, bio, and password.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
