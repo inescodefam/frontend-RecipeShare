@@ -6,111 +6,175 @@ import 'package:shared/shared.dart';
 import '../providers/auth_provider.dart';
 
 class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key});
+  const FeedScreen({super.key, this.refreshToken});
+
+  final String? refreshToken;
 
   @override
   State<FeedScreen> createState() => _FeedScreenState();
 }
 
 class _FeedScreenState extends State<FeedScreen> {
-  late Future<_FeedVm> _future;
+  final _scrollController = ScrollController();
+  final List<Recipe> _recipes = [];
+  int? _nextCursor;
+  bool _hasMore = true;
+  bool _loading = true;
+  bool _loadingMore = false;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _future = _load();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadInitial());
   }
 
-  Future<_FeedVm> _load() async {
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant FeedScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshToken != widget.refreshToken) {
+      _loadInitial();
+    }
+  }
+
+  void _onScroll() {
+    if (!_hasMore || _loadingMore) return;
+    final pos = _scrollController.position;
+    if (pos.pixels > pos.maxScrollExtent - 320) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadInitial() async {
     final auth = context.read<AuthProvider>();
     final user = auth.user;
     if (user == null) {
-      throw StateError('Feed is only available when logged in');
+      setState(() {
+        _error = 'Feed is only available when logged in';
+        _loading = false;
+      });
+      return;
     }
-
-    final services = context.read<RecipeShareServices>();
-    final recipes = await services.recipes.getFeed(user.id);
-
-    final authorIds = recipes.map((r) => r.userId).toSet();
-    final authorsById = <String, User>{};
-
-    // Sequential loads are OK for MVP; can be optimized with parallel later.
-    for (final authorId in authorIds) {
-      authorsById[authorId] = await services.users.getUserById(authorId);
+    setState(() {
+      _loading = true;
+      _error = null;
+      _recipes.clear();
+      _nextCursor = null;
+      _hasMore = true;
+    });
+    try {
+      final services = context.read<RecipeShareServices>();
+      final page = await services.recipes.getFeedPage(user.id, pageSize: 12);
+      if (!mounted) return;
+      setState(() {
+        _recipes.addAll(page.items);
+        _nextCursor = page.nextCursor;
+        _hasMore = page.hasMore;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
     }
+  }
 
-    return _FeedVm(recipes: recipes, authorsById: authorsById);
+  Future<void> _loadMore() async {
+    if (!_hasMore || _loadingMore) return;
+    final auth = context.read<AuthProvider>();
+    final user = auth.user;
+    if (user == null) return;
+
+    setState(() => _loadingMore = true);
+    try {
+      final services = context.read<RecipeShareServices>();
+      final page = await services.recipes.getFeedPage(
+        user.id,
+        cursor: _nextCursor,
+        pageSize: 12,
+      );
+      if (!mounted) return;
+      setState(() {
+        _recipes.addAll(page.items);
+        _nextCursor = page.nextCursor;
+        _hasMore = page.hasMore;
+        _loadingMore = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingMore = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<_FeedVm>(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: LoadingShimmerList());
-        }
-        if (snapshot.hasError) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                snapshot.error.toString(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.error,
-                    ),
-              ),
-            ),
-          );
-        }
-        final vm = snapshot.data;
-        if (vm == null || vm.recipes.isEmpty) {
-          return const EmptyState(
-            icon: Icons.restaurant,
-            message: 'No recipes in your feed yet.',
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: () async {
-            setState(() {
-              _future = _load();
-            });
-          },
-          child: GridView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: vm.recipes.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.62,
-            ),
-            itemBuilder: (context, index) {
-              final recipe = vm.recipes[index];
-              final author = vm.authorsById[recipe.userId];
-              return RecipeCard(
-                recipe: recipe,
-                authorUsername: author?.username,
-                authorAvatarUrl: author?.profileImageUrl,
-                variant: RecipeCardVariant.standard,
-                onTap: () => context.push('/recipes/${recipe.id}'),
-              );
-            },
+    if (_loading) {
+      return const Center(child: LoadingShimmerList());
+    }
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            _error!,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.error,
+                ),
           ),
-        );
-      },
+        ),
+      );
+    }
+    if (_recipes.isEmpty) {
+      return const EmptyState(
+        icon: Icons.restaurant,
+        message: 'No recipes in your feed yet. Follow cooks to see their recipes here.',
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadInitial,
+      child: GridView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(16),
+        itemCount: _recipes.length + (_loadingMore ? 1 : 0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.62,
+        ),
+        itemBuilder: (context, index) {
+          if (index >= _recipes.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          final recipe = _recipes[index];
+          return RecipeCard(
+            recipe: recipe,
+            authorUsername: recipe.authorUsername,
+            authorAvatarUrl: recipe.authorAvatarUrl,
+            variant: RecipeCardVariant.standard,
+            onTap: () async {
+              await context.push('/recipes/${recipe.id}');
+              if (mounted) _loadInitial();
+            },
+          );
+        },
+      ),
     );
   }
 }
-
-class _FeedVm {
-  const _FeedVm({
-    required this.recipes,
-    required this.authorsById,
-  });
-
-  final List<Recipe> recipes;
-  final Map<String, User> authorsById;
-}
-

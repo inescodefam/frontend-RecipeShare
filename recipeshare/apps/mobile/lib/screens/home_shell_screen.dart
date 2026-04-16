@@ -27,9 +27,27 @@ class HomeShellScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final index = _selectedIndex;
 
+    final showFab =
+        location.startsWith('/home/feed') || location.startsWith('/home/explore');
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: child,
+      floatingActionButton: showFab
+          ? FloatingActionButton(
+              onPressed: () async {
+                await context.push('/recipes/create');
+                if (!context.mounted) return;
+                final stamp = DateTime.now().millisecondsSinceEpoch.toString();
+                if (location.startsWith('/home/explore')) {
+                  context.go('/home/explore?refresh=$stamp');
+                } else {
+                  context.go('/home/feed?refresh=$stamp');
+                }
+              },
+              child: const Icon(Icons.add_rounded),
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (i) {
