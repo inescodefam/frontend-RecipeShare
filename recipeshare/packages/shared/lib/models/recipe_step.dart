@@ -20,6 +20,18 @@ class RecipeStep {
     );
   }
 
+  factory RecipeStep.fromApiJson(
+    Map<String, dynamic> json, {
+    required String recipeId,
+  }) {
+    return RecipeStep(
+      id: '',
+      recipeId: recipeId,
+      stepNumber: json['order'] as int? ?? 0,
+      description: json['description'] as String? ?? '',
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

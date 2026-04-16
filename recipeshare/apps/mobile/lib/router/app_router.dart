@@ -10,6 +10,7 @@ import '../screens/register_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/recipe_detail_screen.dart';
+import '../screens/recipe_editor_screen.dart';
 import '../screens/splash_screen.dart';
 
 const _splashPath = '/splash';
@@ -76,12 +77,18 @@ class AppRouter {
             GoRoute(
               path: _homeFeedPath,
               name: 'feed',
-              builder: (context, state) => const FeedScreen(),
+              builder: (context, state) => FeedScreen(
+                key: ValueKey('feed_${state.uri.queryParameters['refresh'] ?? ''}'),
+                refreshToken: state.uri.queryParameters['refresh'],
+              ),
             ),
             GoRoute(
               path: '/home/explore',
               name: 'explore',
-              builder: (context, state) => const ExploreScreen(),
+              builder: (context, state) => ExploreScreen(
+                key: ValueKey('explore_${state.uri.queryParameters['refresh'] ?? ''}'),
+                refreshToken: state.uri.queryParameters['refresh'],
+              ),
             ),
             GoRoute(
               path: '/home/profile',
@@ -94,6 +101,18 @@ class AppRouter {
               builder: (context, state) => const SettingsScreen(),
             ),
           ],
+        ),
+        GoRoute(
+          path: '/recipes/create',
+          name: 'recipeCreate',
+          builder: (context, state) => const RecipeEditorScreen(),
+        ),
+        GoRoute(
+          path: '/recipes/:id/edit',
+          name: 'recipeEdit',
+          builder: (context, state) => RecipeEditorScreen(
+            recipeId: state.pathParameters['id'],
+          ),
         ),
         GoRoute(
           path: '/recipes/:id',

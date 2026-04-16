@@ -1,5 +1,6 @@
-import '../recipe_service.dart';
 import '../../models/models.dart';
+import '../../models/recipe_write_payload.dart';
+import '../recipe_service.dart';
 import 'mock_data_service.dart';
 
 class MockRecipeService implements RecipeService {
@@ -7,8 +8,7 @@ class MockRecipeService implements RecipeService {
 
   final MockDataService _data;
 
-  @override
-  Future<List<Recipe>> getFeed(String userId) async {
+  Future<List<Recipe>> _feedRecipesAsync(String userId) async {
     final follows = await _data.getFollowsByFollowerId(userId);
     final authorIds = follows.map((f) => f.followingId).toSet();
     final recipes = await _data.getRecipes();
@@ -19,12 +19,33 @@ class MockRecipeService implements RecipeService {
   }
 
   @override
-  Future<List<Recipe>> getExplore() async {
+  Future<RecipePage> getFeedPage(
+    String userId, {
+    int? cursor,
+    int pageSize = 10,
+  }) async {
+    final all = await _feedRecipesAsync(userId);
+    return RecipePage(
+      items: all,
+      hasMore: false,
+      nextCursor: null,
+    );
+  }
+
+  @override
+  Future<RecipePage> getExplorePage({
+    int? cursor,
+    int pageSize = 10,
+  }) async {
     final recipes = await _data.getRecipes();
     final sorted = [...recipes];
     double score(Recipe r) => r.likesCount + r.averageRating * 10;
     sorted.sort((a, b) => score(b).compareTo(score(a)));
-    return sorted;
+    return RecipePage(
+      items: sorted,
+      hasMore: false,
+      nextCursor: null,
+    );
   }
 
   @override
@@ -37,19 +58,124 @@ class MockRecipeService implements RecipeService {
     return _data.getRecipeById(id);
   }
 
-  @override
-  Future<void> createRecipe(Recipe recipe) async {
-    await _data.upsertRecipe(recipe);
+  Ingredient _ingredientFromInput(RecipeIngredientInput i, String recipeId) {
+    final amount = double.tryParse(i.quantity) ?? 0;
+    return Ingredient(
+      id: 'ing_${_data.newId()}',
+      recipeId: recipeId,
+      name: i.name,
+      amount: amount,
+      unit: i.unit?.toString() ?? '',
+    );
+  }
+
+  RecipeStep _stepFromInput(RecipeStepInput s, String recipeId) {
+    return RecipeStep(
+      id: 'st_${_data.newId()}',
+      recipeId: recipeId,
+      stepNumber: s.order,
+      description: s.description,
+    );
   }
 
   @override
-  Future<void> updateRecipe(Recipe recipe) async {
+  Future<String> createRecipeWithPayload(
+    RecipeWritePayload payload, {
+    String? ownerUserId,
+  }) async {
+    final id = _data.newId();
+    final recipeId = 'recipe_$id';
+    final recipe = Recipe(
+      id: recipeId,
+      userId: ownerUserId ?? 'user_0001_admin',
+      title: payload.title,
+      description: payload.description ?? '',
+      photoUrl: '',
+      prepTime: payload.prepTimeMinutes,
+      cookTime: payload.cookTimeMinutes,
+      servings: payload.servings,
+      difficulty: payload.difficulty,
+      categoryId: payload.categoryId,
+      tagIds: [...payload.tagIds],
+      isFeature: false,
+      likesCount: 0,
+      averageRating: 0,
+      createdAt: DateTime.now().toUtc(),
+      ingredients: payload.ingredients
+          .map((e) => _ingredientFromInput(e, recipeId))
+          .toList(),
+      steps: payload.steps.map((e) => _stepFromInput(e, recipeId)).toList(),
+      categoryLabel: null,
+      tagLabels: const [],
+    );
     await _data.upsertRecipe(recipe);
+    return recipeId;
+  }
+
+  @override
+  Future<void> updateRecipeWithPayload(String id, RecipeWritePayload payload) async {
+    final existing = await _data.getRecipeById(id);
+    final updated = Recipe(
+      id: existing.id,
+      userId: existing.userId,
+      title: payload.title,
+      description: payload.description ?? '',
+      photoUrl: existing.photoUrl,
+      prepTime: payload.prepTimeMinutes,
+      cookTime: payload.cookTimeMinutes,
+      servings: payload.servings,
+      difficulty: payload.difficulty,
+      categoryId: payload.categoryId,
+      tagIds: [...payload.tagIds],
+      isFeature: existing.isFeature,
+      likesCount: existing.likesCount,
+      averageRating: existing.averageRating,
+      createdAt: existing.createdAt,
+      ingredients: payload.ingredients
+          .map((e) => _ingredientFromInput(e, id))
+          .toList(),
+      steps: payload.steps.map((e) => _stepFromInput(e, id)).toList(),
+      categoryLabel: existing.categoryLabel,
+      tagLabels: existing.tagLabels,
+    );
+    await _data.upsertRecipe(updated);
   }
 
   @override
   Future<void> deleteRecipe(String id) async {
     await _data.deleteRecipeById(id);
+  }
+
+  @override
+  Future<String> uploadRecipeImage(
+    String recipeId,
+    List<int> bytes, {
+    String? filename,
+  }) async {
+    final current = await _data.getRecipeById(recipeId);
+    final next = current.copyWith(
+      photoUrl: 'https://picsum.photos/seed/${recipeId}_${bytes.length}/800/600',
+    );
+    await _data.upsertRecipe(next);
+    return next.photoUrl;
+  }
+
+  @override
+  Future<void> deleteRecipeImage(String recipeId) async {
+    final current = await _data.getRecipeById(recipeId);
+    await _data.upsertRecipe(current.copyWith(photoUrl: ''));
+  }
+
+  @override
+  Future<List<CategoryTag>> listRecipeCategories() async {
+    final all = await _data.getCategories();
+    return all.where((c) => c.type == CategoryTagType.category).toList();
+  }
+
+  @override
+  Future<List<CategoryTag>> listRecipeTags() async {
+    final all = await _data.getTags();
+    return all.where((t) => t.type == CategoryTagType.tag).toList();
   }
 
   @override
