@@ -50,6 +50,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     final currentUserId = context.read<AuthProvider>().user?.id;
     final services = context.read<RecipeShareServices>();
     final recipe = await services.recipes.getRecipeById(id);
+    final commentPage = await services.comments.getCommentsForRecipe(id, pageSize: 20);
+    final collections = await services.collections.getMyCollections();
 
     final User author;
     if (recipe.authorUsername != null && recipe.authorUsername!.isNotEmpty) {
@@ -73,6 +75,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     return _DetailVm(
       recipe: recipe,
       author: author,
+      comments: commentPage.items,
+      collections: collections,
       currentUserId: currentUserId,
     );
   }
@@ -108,6 +112,113 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Image removed')),
       );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _toggleLike(Recipe recipe) async {
+    final services = context.read<RecipeShareServices>();
+    try {
+      await services.recipes.toggleLikeRecipe(recipe.id);
+      if (!mounted) return;
+      _reload();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _rateRecipe(Recipe recipe, double value) async {
+    final services = context.read<RecipeShareServices>();
+    try {
+      await services.recipes.rateRecipe(recipe.id, value.toInt());
+      if (!mounted) return;
+      _reload();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _addComment(Recipe recipe) async {
+    final controller = TextEditingController();
+    final shouldAdd = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add comment'),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          decoration: const InputDecoration(hintText: 'Write your comment'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Post')),
+        ],
+      ),
+    );
+    if (shouldAdd != true || controller.text.trim().isEmpty) return;
+    try {
+      await context.read<RecipeShareServices>().comments.addComment(
+            recipeId: recipe.id,
+            content: controller.text.trim(),
+          );
+      if (!mounted) return;
+      _reload();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _deleteComment(String commentId) async {
+    try {
+      await context.read<RecipeShareServices>().comments.deleteComment(commentId);
+      if (!mounted) return;
+      _reload();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _saveToCollection(Recipe recipe, List<Collection> collections) async {
+    if (collections.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Create a collection first from profile page')),
+      );
+      return;
+    }
+    final selected = await showModalBottomSheet<Collection>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: collections
+              .map(
+                (collection) => ListTile(
+                  title: Text(collection.name),
+                  subtitle: Text('${collection.recipeCount} recipes'),
+                  onTap: () => Navigator.pop(ctx, collection),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+    if (selected == null) return;
+    try {
+      await context.read<RecipeShareServices>().collections.addRecipeToCollection(
+            selected.id,
+            recipe.id,
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Saved to ${selected.name}')),
+      );
+      _reload();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
@@ -162,6 +273,8 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
         final recipe = vm.recipe;
         final author = vm.author;
+        final comments = vm.comments;
+        final collections = vm.collections;
         final services = context.read<RecipeShareServices>();
         final isOwner =
             vm.currentUserId != null && vm.currentUserId == recipe.userId;
@@ -264,11 +377,36 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Icon(Icons.favorite_border_rounded, size: 18, color: AppColors.textSecondary),
+                        IconButton(
+                          onPressed: () => _toggleLike(recipe),
+                          icon: Icon(
+                            recipe.isLikedByMe
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            size: 20,
+                            color: recipe.isLikedByMe ? AppColors.error : AppColors.textSecondary,
+                          ),
+                        ),
                         const SizedBox(width: 6),
                         Text('${recipe.likesCount}', style: Theme.of(context).textTheme.labelMedium),
                         const SizedBox(width: 14),
-                        RatingStars(rating: recipe.averageRating, size: 18),
+                        RatingStars(
+                          rating: (recipe.myRating ?? recipe.averageRating).toDouble(),
+                          size: 18,
+                          interactive: true,
+                          onRatingUpdate: (value) => _rateRecipe(recipe, value),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${recipe.averageRating.toStringAsFixed(1)} (${recipe.ratingCount})',
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                        const Spacer(),
+                        TextButton.icon(
+                          onPressed: () => _saveToCollection(recipe, collections),
+                          icon: const Icon(Icons.bookmark_add_outlined),
+                          label: const Text('Save'),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -286,6 +424,41 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     const SizedBox(height: 8),
                     _StepsList(steps: recipe.steps),
                     const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Text('Comments', style: Theme.of(context).textTheme.titleMedium),
+                        const Spacer(),
+                        TextButton.icon(
+                          onPressed: () => _addComment(recipe),
+                          icon: const Icon(Icons.add_comment_outlined),
+                          label: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (comments.isEmpty)
+                      const Text('No comments yet.')
+                    else
+                      ...comments.map(
+                        (comment) => Card(
+                          child: ListTile(
+                            leading: UserAvatar(
+                              imageUrl: comment.authorAvatarUrl ?? '',
+                              nameForInitials: comment.authorUsername ?? 'U',
+                              radius: 16,
+                            ),
+                            title: Text(comment.authorUsername ?? 'Unknown user'),
+                            subtitle: Text(comment.content),
+                            trailing: vm.currentUserId == comment.userId
+                                ? IconButton(
+                                    icon: const Icon(Icons.delete_outline_rounded),
+                                    onPressed: () => _deleteComment(comment.id),
+                                  )
+                                : null,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 12),
                   ]),
                 ),
               ),
@@ -379,11 +552,15 @@ class _DetailVm {
   const _DetailVm({
     required this.recipe,
     required this.author,
+    required this.comments,
+    required this.collections,
     required this.currentUserId,
   });
 
   final Recipe recipe;
   final User author;
+  final List<Comment> comments;
+  final List<Collection> collections;
   final String? currentUserId;
 }
 

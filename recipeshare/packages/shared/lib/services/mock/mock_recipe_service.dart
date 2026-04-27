@@ -1,5 +1,4 @@
 import '../../models/models.dart';
-import '../../models/recipe_write_payload.dart';
 import '../recipe_service.dart';
 import 'mock_data_service.dart';
 
@@ -34,11 +33,21 @@ class MockRecipeService implements RecipeService {
 
   @override
   Future<RecipePage> getExplorePage({
+    String? search,
+    String? categoryId,
+    List<String> tagIds = const [],
     int? cursor,
     int pageSize = 10,
   }) async {
     final recipes = await _data.getRecipes();
-    final sorted = [...recipes];
+    final sorted = recipes.where((r) {
+      final searchOk = search == null ||
+          search.trim().isEmpty ||
+          r.title.toLowerCase().contains(search.trim().toLowerCase());
+      final categoryOk = categoryId == null || categoryId.isEmpty || r.categoryId == categoryId;
+      final tagsOk = tagIds.isEmpty || tagIds.any(r.tagIds.contains);
+      return searchOk && categoryOk && tagsOk;
+    }).toList();
     double score(Recipe r) => r.likesCount + r.averageRating * 10;
     sorted.sort((a, b) => score(b).compareTo(score(a)));
     return RecipePage(
@@ -179,24 +188,32 @@ class MockRecipeService implements RecipeService {
   }
 
   @override
-  Future<void> likeRecipe(String recipeId, String userId) async {
-    await _data.addLike(
-      Like(
-        id: 'like_${_data.newId()}',
-        userId: userId,
-        recipeId: recipeId,
-        createdAt: DateTime.now().toUtc(),
-      ),
+  Future<ToggleLikeResult> toggleLikeRecipe(String recipeId) async {
+    const userId = 'mock-user';
+    final existing = await _data.getLikesByRecipeId(recipeId);
+    final liked = existing.any((like) => like.userId == userId);
+    if (liked) {
+      await _data.removeLike(userId, recipeId);
+    } else {
+      await _data.addLike(
+        Like(
+          id: 'like_${_data.newId()}',
+          userId: userId,
+          recipeId: recipeId,
+          createdAt: DateTime.now().toUtc(),
+        ),
+      );
+    }
+    final latest = await _data.getRecipeById(recipeId);
+    return ToggleLikeResult(
+      isLiked: !liked,
+      likeCount: latest.likesCount,
     );
   }
 
   @override
-  Future<void> unlikeRecipe(String recipeId, String userId) async {
-    await _data.removeLike(userId, recipeId);
-  }
-
-  @override
-  Future<void> rateRecipe(String recipeId, String userId, int stars) async {
+  Future<RatingSummary> rateRecipe(String recipeId, int stars) async {
+    const userId = 'mock-user';
     final clamped = stars < 1 ? 1 : (stars > 5 ? 5 : stars);
     await _data.upsertRating(
       Rating(
@@ -207,5 +224,15 @@ class MockRecipeService implements RecipeService {
         createdAt: DateTime.now().toUtc(),
       ),
     );
+    final ratings = await _data.getRatingsByRecipeId(recipeId);
+    final avg = ratings.isEmpty
+        ? 0.0
+        : ratings.fold<int>(0, (sum, r) => sum + r.stars) / ratings.length;
+    return RatingSummary(
+      myRating: clamped,
+      averageRating: avg,
+      ratingCount: ratings.length,
+    );
   }
+
 }

@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 import '../../models/models.dart';
-import '../../models/recipe_write_payload.dart';
 import '../recipe_service.dart';
 
 class HttpRecipeService implements RecipeService {
@@ -65,13 +64,24 @@ class HttpRecipeService implements RecipeService {
 
   @override
   Future<RecipePage> getExplorePage({
+    String? search,
+    String? categoryId,
+    List<String> tagIds = const [],
     int? cursor,
     int pageSize = 10,
   }) async {
+    final parsedCategoryId = int.tryParse(categoryId ?? '');
+    final parsedTagIds = tagIds
+        .map((id) => int.tryParse(id))
+        .whereType<int>()
+        .toList();
     try {
       final res = await _dio.get<Map<String, dynamic>>(
         '/api/recipes',
         queryParameters: <String, dynamic>{
+          if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
+          if (parsedCategoryId != null) 'categoryId': parsedCategoryId,
+          if (parsedTagIds.isNotEmpty) 'tagIds': parsedTagIds,
           'pageSize': pageSize,
           if (cursor != null) 'cursor': cursor,
         },
@@ -226,17 +236,35 @@ class HttpRecipeService implements RecipeService {
   }
 
   @override
-  Future<void> likeRecipe(String recipeId, String userId) async {
-    throw UnimplementedError('Likes API not wired yet');
+  Future<ToggleLikeResult> toggleLikeRecipe(String recipeId) async {
+    try {
+      final res = await _dio.post<Map<String, dynamic>>('/api/recipes/$recipeId/like');
+      final data = res.data ?? const <String, dynamic>{};
+      return ToggleLikeResult(
+        isLiked: data['isLiked'] as bool? ?? false,
+        likeCount: data['likeCount'] as int? ?? 0,
+      );
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
   }
 
   @override
-  Future<void> unlikeRecipe(String recipeId, String userId) async {
-    throw UnimplementedError('Likes API not wired yet');
-  }
-
-  @override
-  Future<void> rateRecipe(String recipeId, String userId, int stars) async {
-    throw UnimplementedError('Ratings API not wired yet');
+  Future<RatingSummary> rateRecipe(String recipeId, int stars) async {
+    final clamped = stars.clamp(1, 5);
+    try {
+      final res = await _dio.put<Map<String, dynamic>>(
+        '/api/recipes/$recipeId/rating',
+        data: <String, dynamic>{'value': clamped},
+      );
+      final data = res.data ?? const <String, dynamic>{};
+      return RatingSummary(
+        myRating: data['myRating'] as int?,
+        averageRating: (data['averageRating'] as num?)?.toDouble() ?? 0,
+        ratingCount: data['ratingCount'] as int? ?? 0,
+      );
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
   }
 }

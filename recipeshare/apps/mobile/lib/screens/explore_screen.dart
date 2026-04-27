@@ -14,7 +14,12 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   final _scrollController = ScrollController();
+  final _searchController = TextEditingController();
   final List<Recipe> _recipes = [];
+  List<CategoryTag> _categories = const [];
+  List<CategoryTag> _tags = const [];
+  String? _selectedCategoryId;
+  final Set<String> _selectedTagIds = <String>{};
   int? _nextCursor;
   bool _hasMore = true;
   bool _loading = true;
@@ -32,6 +37,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -61,7 +67,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
     try {
       final services = context.read<RecipeShareServices>();
-      final page = await services.recipes.getExplorePage(pageSize: 12);
+      if (_categories.isEmpty && _tags.isEmpty) {
+        _categories = await services.recipes.listRecipeCategories();
+        _tags = await services.recipes.listRecipeTags();
+      }
+      final page = await services.recipes.getExplorePage(
+        search: _searchController.text,
+        categoryId: _selectedCategoryId,
+        tagIds: _selectedTagIds.toList(),
+        pageSize: 12,
+      );
       if (!mounted) return;
       setState(() {
         _recipes.addAll(page.items);
@@ -84,6 +99,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
     try {
       final services = context.read<RecipeShareServices>();
       final page = await services.recipes.getExplorePage(
+        search: _searchController.text,
+        categoryId: _selectedCategoryId,
+        tagIds: _selectedTagIds.toList(),
         cursor: _nextCursor,
         pageSize: 12,
       );
@@ -125,40 +143,160 @@ class _ExploreScreenState extends State<ExploreScreen> {
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadInitial,
-      child: GridView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.all(16),
-        itemCount: _recipes.length + (_loadingMore ? 1 : 0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.62,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search_rounded),
+              hintText: 'Search recipes by name',
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.tune_rounded),
+                onPressed: _openFilters,
+              ),
+            ),
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => _loadInitial(),
+          ),
         ),
-        itemBuilder: (context, index) {
-          if (index >= _recipes.length) {
-            return const Center(
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _loadInitial,
+            child: GridView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(16),
+              itemCount: _recipes.length + (_loadingMore ? 1 : 0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.62,
+              ),
+              itemBuilder: (context, index) {
+                if (index >= _recipes.length) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                final recipe = _recipes[index];
+                return RecipeCard(
+                  recipe: recipe,
+                  authorUsername: recipe.authorUsername,
+                  authorAvatarUrl: recipe.authorAvatarUrl,
+                  variant: RecipeCardVariant.standard,
+                  onTap: () async {
+                    await context.push('/recipes/${recipe.id}');
+                    if (mounted) _loadInitial();
+                  },
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openFilters() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
+        String? selectedCategory = _selectedCategoryId;
+        final selectedTags = <String>{..._selectedTagIds};
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SafeArea(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
+                padding: const EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Filters', style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        value: selectedCategory,
+                        items: [
+                          const DropdownMenuItem<String>(
+                            value: null,
+                            child: Text('All categories'),
+                          ),
+                          ..._categories.map(
+                            (c) => DropdownMenuItem<String>(
+                              value: c.id,
+                              child: Text(c.name),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) => setModalState(() => selectedCategory = value),
+                      ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _tags
+                            .map(
+                              (tag) => FilterChip(
+                                label: Text(tag.name),
+                                selected: selectedTags.contains(tag.id),
+                                onSelected: (selected) {
+                                  setModalState(() {
+                                    if (selected) {
+                                      selectedTags.add(tag.id);
+                                    } else {
+                                      selectedTags.remove(tag.id);
+                                    }
+                                  });
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedCategoryId = null;
+                                _selectedTagIds.clear();
+                              });
+                              Navigator.of(ctx).pop();
+                              _loadInitial();
+                            },
+                            child: const Text('Reset'),
+                          ),
+                          const Spacer(),
+                          FilledButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedCategoryId = selectedCategory;
+                                _selectedTagIds
+                                  ..clear()
+                                  ..addAll(selectedTags);
+                              });
+                              Navigator.of(ctx).pop();
+                              _loadInitial();
+                            },
+                            child: const Text('Apply'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
-          }
-          final recipe = _recipes[index];
-          return RecipeCard(
-            recipe: recipe,
-            authorUsername: recipe.authorUsername,
-            authorAvatarUrl: recipe.authorAvatarUrl,
-            variant: RecipeCardVariant.standard,
-            onTap: () async {
-              await context.push('/recipes/${recipe.id}');
-              if (mounted) _loadInitial();
-            },
-          );
-        },
-      ),
+          },
+        );
+      },
     );
   }
 }
