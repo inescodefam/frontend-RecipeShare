@@ -120,6 +120,32 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search_rounded),
+                hintText: 'Search recipes by name',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.tune_rounded),
+                  onPressed: _openFilters,
+                ),
+              ),
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _loadInitial(),
+            ),
+          ),
+          Expanded(child: _buildBody()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
     if (_loading) {
       return const Center(child: LoadingShimmerList());
     }
@@ -142,76 +168,53 @@ class _ExploreScreenState extends State<ExploreScreen> {
         message: 'No recipes to explore yet.',
       );
     }
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search_rounded),
-              hintText: 'Search recipes by name',
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.tune_rounded),
-                onPressed: _openFilters,
-              ),
-            ),
-            textInputAction: TextInputAction.search,
-            onSubmitted: (_) => _loadInitial(),
-          ),
+    return RefreshIndicator(
+      onRefresh: _loadInitial,
+      child: GridView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(16),
+        itemCount: _recipes.length + (_loadingMore ? 1 : 0),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.62,
         ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _loadInitial,
-            child: GridView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _recipes.length + (_loadingMore ? 1 : 0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.62,
+        itemBuilder: (context, index) {
+          if (index >= _recipes.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(),
               ),
-              itemBuilder: (context, index) {
-                if (index >= _recipes.length) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                final recipe = _recipes[index];
-                return RecipeCard(
-                  recipe: recipe,
-                  authorUsername: recipe.authorUsername,
-                  authorAvatarUrl: recipe.authorAvatarUrl,
-                  variant: RecipeCardVariant.standard,
-                  onTap: () async {
-                    await context.push('/recipes/${recipe.id}');
-                    if (mounted) _loadInitial();
-                  },
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+            );
+          }
+          final recipe = _recipes[index];
+          return RecipeCard(
+            recipe: recipe,
+            authorUsername: recipe.authorUsername,
+            authorAvatarUrl: recipe.authorAvatarUrl,
+            variant: RecipeCardVariant.standard,
+            onTap: () async {
+              await context.push('/recipes/${recipe.id}');
+              if (mounted) _loadInitial();
+            },
+          );
+        },
+      ),
     );
   }
 
   Future<void> _openFilters() async {
-    await showModalBottomSheet<void>(
+    await showDialog<void>(
       context: context,
-      isScrollControlled: true,
       builder: (ctx) {
         String? selectedCategory = _selectedCategoryId;
         final selectedTags = <String>{..._selectedTagIds};
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return SafeArea(
+            return Dialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 72),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: SingleChildScrollView(

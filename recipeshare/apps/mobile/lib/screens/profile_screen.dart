@@ -232,29 +232,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _showCollectionRecipes(Collection collection) async {
-    try {
-      final items = await context.read<RecipeShareServices>().collections.getCollectionRecipes(collection.id);
-      if (!mounted) return;
-      await showModalBottomSheet<void>(
-        context: context,
-        builder: (ctx) => SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              ListTile(title: Text(collection.name)),
-              ...items.map(
-                (recipe) => ListTile(
-                  title: Text(recipe.title),
-                  subtitle: Text(recipe.categoryLabel ?? ''),
-                ),
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => _CollectionRecipesScreen(collection: collection),
+      ),
+    );
+    if (!mounted) return;
+    _reloadCollections();
+  }
+}
+
+class _CollectionRecipesScreen extends StatefulWidget {
+  const _CollectionRecipesScreen({required this.collection});
+
+  final Collection collection;
+
+  @override
+  State<_CollectionRecipesScreen> createState() => _CollectionRecipesScreenState();
+}
+
+class _CollectionRecipesScreenState extends State<_CollectionRecipesScreen> {
+  late Future<List<Recipe>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<List<Recipe>> _load() {
+    return context.read<RecipeShareServices>().collections.getCollectionRecipes(widget.collection.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.collection.name)),
+      body: FutureBuilder<List<Recipe>>(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(snapshot.error.toString()),
               ),
-            ],
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
+            );
+          }
+          final recipes = snapshot.data ?? const [];
+          if (recipes.isEmpty) {
+            return const Center(child: Text('This collection is empty.'));
+          }
+          return ListView.builder(
+            itemCount: recipes.length,
+            itemBuilder: (context, index) {
+              final recipe = recipes[index];
+              return ListTile(
+                title: Text(recipe.title),
+                subtitle: Text(recipe.categoryLabel ?? ''),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/recipes/${recipe.id}'),
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 }
