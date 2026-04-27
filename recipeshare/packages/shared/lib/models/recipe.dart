@@ -16,7 +16,11 @@ class Recipe {
   final List<String> tagIds;
   final bool isFeature;
   final int likesCount;
+  final bool isLikedByMe;
   final double averageRating;
+  final int ratingCount;
+  final int? myRating;
+  final int commentCount;
   final DateTime createdAt;
   final List<Ingredient> ingredients;
   final List<RecipeStep> steps;
@@ -42,7 +46,11 @@ class Recipe {
     required this.tagIds,
     required this.isFeature,
     required this.likesCount,
+    this.isLikedByMe = false,
     required this.averageRating,
+    this.ratingCount = 0,
+    this.myRating,
+    this.commentCount = 0,
     required this.createdAt,
     required this.ingredients,
     required this.steps,
@@ -71,7 +79,11 @@ class Recipe {
       tagIds: (json['tagIds'] as List<dynamic>).cast<String>(),
       isFeature: json['isFeature'] as bool,
       likesCount: json['likesCount'] as int,
+      isLikedByMe: json['isLikedByMe'] as bool? ?? false,
       averageRating: (json['averageRating'] as num).toDouble(),
+      ratingCount: json['ratingCount'] as int? ?? 0,
+      myRating: json['myRating'] as int?,
+      commentCount: json['commentCount'] as int? ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
       ingredients: (json['ingredients'] as List<dynamic>)
           .map((item) => Ingredient.fromJson(item as Map<String, dynamic>))
@@ -119,8 +131,12 @@ class Recipe {
       categoryId: '0',
       tagIds: const [],
       isFeature: json['isFeatured'] as bool? ?? false,
-      likesCount: 0,
-      averageRating: 0,
+      likesCount: json['likeCount'] as int? ?? 0,
+      isLikedByMe: json['isLikedByMe'] as bool? ?? false,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
+      ratingCount: json['ratingCount'] as int? ?? 0,
+      myRating: json['myRating'] as int?,
+      commentCount: json['commentCount'] as int? ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
       ingredients: const [],
       steps: const [],
@@ -158,8 +174,12 @@ class Recipe {
       categoryId: '${json['categoryId']}',
       tagIds: const [],
       isFeature: json['isFeatured'] as bool? ?? false,
-      likesCount: 0,
-      averageRating: 0,
+      likesCount: json['likeCount'] as int? ?? 0,
+      isLikedByMe: json['isLikedByMe'] as bool? ?? false,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
+      ratingCount: json['ratingCount'] as int? ?? 0,
+      myRating: json['myRating'] as int?,
+      commentCount: json['commentCount'] as int? ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
       ingredients: ingredients,
       steps: steps,
@@ -184,7 +204,11 @@ class Recipe {
     List<String>? tagIds,
     bool? isFeature,
     int? likesCount,
+    bool? isLikedByMe,
     double? averageRating,
+    int? ratingCount,
+    int? myRating,
+    int? commentCount,
     DateTime? createdAt,
     List<Ingredient>? ingredients,
     List<RecipeStep>? steps,
@@ -207,7 +231,11 @@ class Recipe {
       tagIds: tagIds ?? this.tagIds,
       isFeature: isFeature ?? this.isFeature,
       likesCount: likesCount ?? this.likesCount,
+      isLikedByMe: isLikedByMe ?? this.isLikedByMe,
       averageRating: averageRating ?? this.averageRating,
+      ratingCount: ratingCount ?? this.ratingCount,
+      myRating: myRating ?? this.myRating,
+      commentCount: commentCount ?? this.commentCount,
       createdAt: createdAt ?? this.createdAt,
       ingredients: ingredients ?? this.ingredients,
       steps: steps ?? this.steps,
@@ -233,7 +261,11 @@ class Recipe {
       'tagIds': tagIds,
       'isFeature': isFeature,
       'likesCount': likesCount,
+      'isLikedByMe': isLikedByMe,
       'averageRating': averageRating,
+      'ratingCount': ratingCount,
+      'myRating': myRating,
+      'commentCount': commentCount,
       'createdAt': createdAt.toIso8601String(),
       'ingredients': ingredients.map((item) => item.toJson()).toList(),
       'steps': steps.map((item) => item.toJson()).toList(),

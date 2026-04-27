@@ -1,5 +1,4 @@
 import '../models/models.dart';
-import '../models/recipe_write_payload.dart';
 
 class RecipePage {
   const RecipePage({
@@ -14,6 +13,28 @@ class RecipePage {
   final int? nextCursor;
 }
 
+class ToggleLikeResult {
+  const ToggleLikeResult({
+    required this.isLiked,
+    required this.likeCount,
+  });
+
+  final bool isLiked;
+  final int likeCount;
+}
+
+class RatingSummary {
+  const RatingSummary({
+    required this.myRating,
+    required this.averageRating,
+    required this.ratingCount,
+  });
+
+  final int? myRating;
+  final double averageRating;
+  final int ratingCount;
+}
+
 abstract class RecipeService {
   Future<RecipePage> getFeedPage(
     String userId, {
@@ -22,6 +43,9 @@ abstract class RecipeService {
   });
 
   Future<RecipePage> getExplorePage({
+    String? search,
+    String? categoryId,
+    List<String> tagIds = const [],
     int? cursor,
     int pageSize = 10,
   });
@@ -51,9 +75,7 @@ abstract class RecipeService {
 
   Future<List<CategoryTag>> listRecipeTags();
 
-  Future<void> likeRecipe(String recipeId, String userId);
+  Future<ToggleLikeResult> toggleLikeRecipe(String recipeId);
 
-  Future<void> unlikeRecipe(String recipeId, String userId);
-
-  Future<void> rateRecipe(String recipeId, String userId, int stars);
+  Future<RatingSummary> rateRecipe(String recipeId, int stars);
 }

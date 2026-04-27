@@ -8,15 +8,15 @@ class MockCollectionService implements CollectionService {
   final MockDataService _data;
 
   @override
-  Future<List<Collection>> getCollectionsForUser(String userId) async {
-    return _data.getCollectionsByUserId(userId);
+  Future<List<Collection>> getMyCollections() async {
+    return _data.getAllCollections();
   }
 
   @override
-  Future<Collection> createCollection(String userId, String name) async {
+  Future<Collection> createCollection(String name) async {
     final c = Collection(
       id: 'col_${_data.newId()}',
-      userId: userId,
+      userId: 'mock-user',
       name: name.trim(),
       recipeIds: const [],
     );
@@ -58,6 +58,15 @@ class MockCollectionService implements CollectionService {
         recipeIds: existing.recipeIds.where((id) => id != recipeId).toList(),
       ),
     );
+  }
+
+  @override
+  Future<List<Recipe>> getCollectionRecipes(String collectionId) async {
+    final collection = await _data.getCollectionById(collectionId);
+    if (collection == null) return const [];
+    final all = await _data.getRecipes();
+    final recipeIds = collection.recipeIds.toSet();
+    return all.where((recipe) => recipeIds.contains(recipe.id)).toList();
   }
 
   @override
