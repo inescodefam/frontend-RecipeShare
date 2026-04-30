@@ -45,9 +45,8 @@ class HttpRecipeService implements RecipeService {
   }) async {
     try {
       final res = await _dio.get<Map<String, dynamic>>(
-        '/api/recipes',
+        '/api/feed',
         queryParameters: <String, dynamic>{
-          'followingOnly': true,
           'pageSize': pageSize,
           if (cursor != null) 'cursor': cursor,
         },
@@ -77,7 +76,7 @@ class HttpRecipeService implements RecipeService {
         .toList();
     try {
       final res = await _dio.get<Map<String, dynamic>>(
-        '/api/recipes',
+        '/api/feed/explore',
         queryParameters: <String, dynamic>{
           if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
           if (parsedCategoryId != null) 'categoryId': parsedCategoryId,
@@ -98,8 +97,17 @@ class HttpRecipeService implements RecipeService {
 
   @override
   Future<List<Recipe>> getFeatured() async {
-    final page = await getExplorePage(pageSize: 50);
-    return page.items.where((r) => r.isFeature).toList();
+    try {
+      final res = await _dio.get<Map<String, dynamic>>(
+        '/api/feed/featured',
+        queryParameters: const <String, dynamic>{'pageSize': 10},
+      );
+      final data = res.data;
+      if (data == null) return const [];
+      return _mapPage(data).items;
+    } on DioException catch (e) {
+      throw StateError(_messageFromDio(e));
+    }
   }
 
   @override
