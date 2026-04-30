@@ -18,6 +18,7 @@ export 'services/http/dio_error_message.dart';
 export 'services/http/http_admin_categories_service.dart';
 export 'services/http/http_admin_tags_service.dart';
 export 'services/http/http_auth_service.dart';
+export 'services/http/http_admin_service.dart';
 export 'services/http/http_collection_service.dart';
 export 'services/http/http_comment_service.dart';
 export 'services/http/http_recipe_service.dart';
