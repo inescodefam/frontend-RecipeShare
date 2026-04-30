@@ -16,6 +16,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
   final List<Recipe> _recipes = [];
+  List<Recipe> _featuredRecipes = const [];
   List<CategoryTag> _categories = const [];
   List<CategoryTag> _tags = const [];
   String? _selectedCategoryId;
@@ -62,6 +63,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       _loading = true;
       _error = null;
       _recipes.clear();
+      _featuredRecipes = const [];
       _nextCursor = null;
       _hasMore = true;
     });
@@ -71,6 +73,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         _categories = await services.recipes.listRecipeCategories();
         _tags = await services.recipes.listRecipeTags();
       }
+      final featured = await services.recipes.getFeatured();
       final page = await services.recipes.getExplorePage(
         search: _searchController.text,
         categoryId: _selectedCategoryId,
@@ -79,6 +82,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       );
       if (!mounted) return;
       setState(() {
+        _featuredRecipes = featured;
         _recipes.addAll(page.items);
         _nextCursor = page.nextCursor;
         _hasMore = page.hasMore;
@@ -163,45 +167,103 @@ class _ExploreScreenState extends State<ExploreScreen> {
       );
     }
     if (_recipes.isEmpty) {
-      return const EmptyState(
-        icon: Icons.explore_rounded,
-        message: 'No recipes to explore yet.',
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (_featuredRecipes.isNotEmpty) _buildFeaturedSection(),
+          const EmptyState(
+            icon: Icons.explore_rounded,
+            message: 'No recipes to explore yet.',
+          ),
+        ],
       );
     }
     return RefreshIndicator(
       onRefresh: _loadInitial,
-      child: GridView.builder(
+      child: CustomScrollView(
         controller: _scrollController,
-        padding: const EdgeInsets.all(16),
-        itemCount: _recipes.length + (_loadingMore ? 1 : 0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.62,
-        ),
-        itemBuilder: (context, index) {
-          if (index >= _recipes.length) {
-            return const Center(
+        slivers: [
+          if (_featuredRecipes.isNotEmpty)
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: _buildFeaturedSection(),
               ),
-            );
-          }
-          final recipe = _recipes[index];
-          return RecipeCard(
-            recipe: recipe,
-            authorUsername: recipe.authorUsername,
-            authorAvatarUrl: recipe.authorAvatarUrl,
-            variant: RecipeCardVariant.standard,
-            onTap: () async {
-              await context.push('/recipes/${recipe.id}');
-              if (mounted) _loadInitial();
-            },
-          );
-        },
+            ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  if (index >= _recipes.length) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  final recipe = _recipes[index];
+                  return RecipeCard(
+                    recipe: recipe,
+                    authorUsername: recipe.authorUsername,
+                    authorAvatarUrl: recipe.authorAvatarUrl,
+                    variant: RecipeCardVariant.standard,
+                    onTap: () async {
+                      await context.push('/recipes/${recipe.id}');
+                      if (mounted) _loadInitial();
+                    },
+                  );
+                },
+                childCount: _recipes.length + (_loadingMore ? 1 : 0),
+              ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.62,
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildFeaturedSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Featured recipes',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 290,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _featuredRecipes.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final recipe = _featuredRecipes[index];
+              return SizedBox(
+                width: 170,
+                child: RecipeCard(
+                  recipe: recipe,
+                  authorUsername: recipe.authorUsername,
+                  authorAvatarUrl: recipe.authorAvatarUrl,
+                  variant: RecipeCardVariant.standard,
+                  onTap: () async {
+                    await context.push('/recipes/${recipe.id}');
+                    if (mounted) _loadInitial();
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
