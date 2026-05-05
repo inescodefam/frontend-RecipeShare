@@ -5,6 +5,7 @@ import 'http/auth_session_storage.dart';
 import 'auth_service.dart';
 import 'collection_service.dart';
 import 'comment_service.dart';
+import 'device_token_service.dart';
 import 'recipe_service.dart';
 import 'report_service.dart';
 import 'user_service.dart';
@@ -12,6 +13,7 @@ import 'http/http_auth_service.dart';
 import 'http/http_collection_service.dart';
 import 'http/http_comment_service.dart';
 import 'http/http_admin_service.dart';
+import 'http/http_device_token_service.dart';
 import 'http/http_recipe_service.dart';
 import 'http/http_user_service.dart';
 import 'mock/mock_admin_service.dart';
@@ -19,6 +21,7 @@ import 'mock/mock_auth_service.dart';
 import 'mock/mock_collection_service.dart';
 import 'mock/mock_comment_service.dart';
 import 'mock/mock_data_service.dart';
+import 'mock/mock_device_token_service.dart';
 import 'mock/mock_recipe_service.dart';
 import 'mock/mock_report_service.dart';
 import 'mock/mock_user_service.dart';
@@ -30,6 +33,7 @@ class RecipeShareServices {
     required this.recipes,
     required this.users,
     required this.comments,
+    required this.deviceTokens,
     required this.collections,
     required this.reports,
     required this.admin,
@@ -41,6 +45,7 @@ class RecipeShareServices {
   final RecipeService recipes;
   final UserService users;
   final CommentService comments;
+  final DeviceTokenService deviceTokens;
   final CollectionService collections;
   final ReportService reports;
   final AdminService admin;
@@ -53,6 +58,7 @@ class RecipeShareServices {
       recipes: MockRecipeService(data),
       users: MockUserService(data),
       comments: MockCommentService(data),
+      deviceTokens: MockDeviceTokenService(),
       collections: MockCollectionService(data),
       reports: MockReportService(data),
       admin: MockAdminService(data),
@@ -68,6 +74,7 @@ class RecipeShareServices {
       recipes: HttpRecipeService(dio),
       users: HttpUserService(dio),
       comments: HttpCommentService(dio),
+      deviceTokens: HttpDeviceTokenService(dio),
       collections: HttpCollectionService(dio),
       reports: MockReportService(data),
       admin: HttpAdminService(dio),
