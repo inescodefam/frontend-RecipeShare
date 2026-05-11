@@ -1,3 +1,4 @@
+import 'admin_report.dart';
 import 'enums.dart';
 
 class Report {
@@ -37,11 +38,7 @@ class Report {
         fallback: ReportReason.spam,
       ),
       description: json['description'] as String?,
-      status: enumFromString(
-        ReportStatus.values,
-        json['status'] as String,
-        fallback: ReportStatus.pending,
-      ),
+      status: reportStatusFromApi(json['status'] as String? ?? ''),
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
