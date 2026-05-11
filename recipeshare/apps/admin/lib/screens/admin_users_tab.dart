@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
+import '../providers/auth_provider.dart';
 import 'admin_recipes_tab.dart';
 
 class AdminUsersTab extends StatefulWidget {
@@ -62,7 +63,19 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
     }
   }
 
+  bool _isCurrentUser(AdminUserListItem user) {
+    final currentUserId = context.read<AuthProvider>().user?.id;
+    if (currentUserId == null) return false;
+    return currentUserId == '${user.id}';
+  }
+
   Future<void> _toggleBlocked(AdminUserListItem user) async {
+    if (_isCurrentUser(user)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You cannot block your own account.')),
+      );
+      return;
+    }
     try {
       await context.read<RecipeShareServices>().admin.toggleUserBlocked('${user.id}');
       if (!mounted) return;
@@ -82,6 +95,12 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
   }
 
   Future<void> _setDeleted(AdminUserListItem user, bool delete) async {
+    if (_isCurrentUser(user)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You cannot delete your own account from here.')),
+      );
+      return;
+    }
     try {
       final admin = context.read<RecipeShareServices>().admin;
       if (delete) {
@@ -103,6 +122,8 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = context.watch<AuthProvider>().user?.id;
+
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -175,6 +196,8 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                           DataColumn(label: Text('Actions')),
                         ],
                         rows: _users.map((user) {
+                          final isCurrentUser =
+                              currentUserId != null && currentUserId == '${user.id}';
                           return DataRow(
                             cells: [
                               DataCell(Text('${user.id}')),
@@ -187,11 +210,15 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                                   spacing: 8,
                                   children: [
                                     TextButton(
-                                      onPressed: () => _toggleBlocked(user),
+                                      onPressed: isCurrentUser
+                                          ? null
+                                          : () => _toggleBlocked(user),
                                       child: Text(user.isBlocked ? 'Unblock' : 'Block'),
                                     ),
                                     TextButton(
-                                      onPressed: () => _setDeleted(user, !user.isDeleted),
+                                      onPressed: isCurrentUser
+                                          ? null
+                                          : () => _setDeleted(user, !user.isDeleted),
                                       child: Text(user.isDeleted ? 'Restore' : 'Delete'),
                                     ),
                                   ],
