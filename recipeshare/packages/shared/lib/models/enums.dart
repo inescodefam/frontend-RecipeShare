@@ -7,7 +7,9 @@ enum ReportTargetType { recipe, user, comment }
 
 enum ReportReason { spam, offensive, inappropriate }
 
-enum ReportStatus { pending, approved, rejected }
+enum ReportStatus { pending, resolved, dismissed }
+
+enum AdminAction { none, warning, block, softDelete }
 
 T enumFromString<T extends Enum>(
   List<T> values,
