@@ -177,6 +177,8 @@ class _AdminCatalogTabState extends State<AdminCatalogTab> {
   List<AdminCatalogRow> _items = [];
   bool _loading = true;
   String? _error;
+  int _page = 1;
+  final int _pageSize = 10;
 
   @override
   void dispose() {
@@ -219,6 +221,14 @@ class _AdminCatalogTabState extends State<AdminCatalogTab> {
     final q = _search.text.trim().toLowerCase();
     if (q.isEmpty) return _items;
     return _items.where((e) => e.name.toLowerCase().contains(q)).toList();
+  }
+
+  List<AdminCatalogRow> get _pagedRows {
+    final rows = _filtered;
+    final start = (_page - 1) * _pageSize;
+    if (start >= rows.length) return const [];
+    final end = start + _pageSize > rows.length ? rows.length : start + _pageSize;
+    return rows.sublist(start, end);
   }
 
   Future<void> _add() async {
@@ -332,7 +342,9 @@ class _AdminCatalogTabState extends State<AdminCatalogTab> {
       );
     }
 
-    final rows = _filtered;
+    final totalCount = _filtered.length;
+    final rows = _pagedRows;
+    final hasNextPage = _page * _pageSize < totalCount;
 
     return RefreshIndicator(
       onRefresh: _load,
@@ -347,7 +359,16 @@ class _AdminCatalogTabState extends State<AdminCatalogTab> {
               prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(),
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() => _page = 1),
+          ),
+          const SizedBox(height: 16),
+          PagerBar(
+            page: _page,
+            pageSize: _pageSize,
+            totalCount: totalCount,
+            hasNextPage: hasNextPage,
+            onPrevious: _page > 1 ? () => setState(() => _page -= 1) : null,
+            onNext: hasNextPage ? () => setState(() => _page += 1) : null,
           ),
           const SizedBox(height: 16),
           Row(

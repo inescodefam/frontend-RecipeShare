@@ -15,7 +15,7 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
   bool _loading = true;
   String? _error;
   int _page = 1;
-  final int _pageSize = 20;
+  final int _pageSize = 10;
   int _totalCount = 0;
   bool _hasNextPage = false;
 

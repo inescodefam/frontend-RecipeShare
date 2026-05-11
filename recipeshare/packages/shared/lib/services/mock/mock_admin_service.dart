@@ -122,7 +122,7 @@ class MockAdminService implements AdminService {
   @override
   Future<PagedResponse<AdminRecipeListItem>> getAdminRecipes({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     String? search,
     bool? isDeleted,
     bool? isFeatured,
@@ -203,7 +203,7 @@ class MockAdminService implements AdminService {
   @override
   Future<PagedResponse<AdminUserListItem>> getAdminUsers({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     String? search,
   }) async {
     final users = await getUsersPage(page: pageNumber - 1, pageSize: pageSize, filter: search);
@@ -232,7 +232,7 @@ class MockAdminService implements AdminService {
   @override
   Future<PagedResponse<AdminReportSummary>> getAdminReports({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     ReportStatus? status,
   }) async {
     final reports = await getAllReports();

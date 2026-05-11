@@ -42,7 +42,7 @@ abstract class AdminService {
 
   Future<PagedResponse<AdminRecipeListItem>> getAdminRecipes({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     String? search,
     bool? isDeleted,
     bool? isFeatured,
@@ -52,13 +52,13 @@ abstract class AdminService {
 
   Future<PagedResponse<AdminUserListItem>> getAdminUsers({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     String? search,
   });
 
   Future<PagedResponse<AdminReportSummary>> getAdminReports({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     ReportStatus? status,
   });
 

@@ -20,7 +20,7 @@ class HttpAdminService implements AdminService {
   @override
   Future<PagedResponse<AdminRecipeListItem>> getAdminRecipes({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     String? search,
     bool? isDeleted,
     bool? isFeatured,
@@ -125,7 +125,7 @@ class HttpAdminService implements AdminService {
   @override
   Future<PagedResponse<AdminUserListItem>> getAdminUsers({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     String? search,
   }) {
     return _request(() async {
@@ -167,7 +167,7 @@ class HttpAdminService implements AdminService {
   @override
   Future<PagedResponse<AdminReportSummary>> getAdminReports({
     int pageNumber = 1,
-    int pageSize = 20,
+    int pageSize = 10,
     ReportStatus? status,
   }) {
     return _request(() async {
