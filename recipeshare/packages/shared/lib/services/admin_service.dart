@@ -30,7 +30,48 @@ abstract class AdminService {
 
   Future<void> deleteRecipe(String recipeId);
 
+  Future<void> restoreRecipe(String recipeId);
+
   Future<void> deleteComment(String commentId);
+
+  Future<void> restoreComment(String commentId);
+
+  Future<void> toggleUserBlocked(String userId);
+
+  Future<void> restoreUser(String userId);
+
+  Future<PagedResponse<AdminRecipeListItem>> getAdminRecipes({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+    bool? isDeleted,
+    bool? isFeatured,
+  });
+
+  Future<AdminRecipeDetail> getAdminRecipeById(int id);
+
+  Future<PagedResponse<AdminUserListItem>> getAdminUsers({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+  });
+
+  Future<PagedResponse<AdminReportSummary>> getAdminReports({
+    int pageNumber = 1,
+    int pageSize = 20,
+    ReportStatus? status,
+  });
+
+  Future<AdminReportDetail> getAdminReportById(int id);
+
+  Future<void> resolveAdminReport(
+    int id, {
+    required AdminAction contentAction,
+    required AdminAction userAction,
+    String? adminNote,
+  });
+
+  Future<void> dismissAdminReport(int id);
 
   Future<void> updateReportStatus(String reportId, ReportStatus status);
 
