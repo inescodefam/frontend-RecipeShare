@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
 import '../providers/auth_provider.dart';
+import 'admin_recipes_tab.dart';
+import 'admin_reports_tab.dart';
+import 'admin_users_tab.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -81,6 +84,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       selectedIcon: Icon(Icons.restaurant_menu),
                       label: Text('Recipes'),
                     ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.people_outline),
+                      selectedIcon: Icon(Icons.people),
+                      label: Text('Users'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.flag_outlined),
+                      selectedIcon: Icon(Icons.flag),
+                      label: Text('Reports'),
+                    ),
                   ],
                 ),
                 const VerticalDivider(width: 1, thickness: 1),
@@ -105,6 +118,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 singular: 'Tag',
                               ),
                               const AdminRecipesTab(),
+                              const AdminUsersTab(),
+                              const AdminReportsTab(),
                             ],
                           ),
                         ),
@@ -129,182 +144,14 @@ class _ApiRequiredMessage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'Category and tag management requires the real API. Run the admin app '
-            'without USE_MOCK_DATA (default) and point API_BASE_URL at your backend.',
+            'Admin moderation requires the real API. Run the admin app without '
+            'USE_MOCK_DATA (default) and point API_BASE_URL at your backend.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppColors.textSecondary,
                 ),
             textAlign: TextAlign.center,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class AdminRecipesTab extends StatefulWidget {
-  const AdminRecipesTab({super.key});
-
-  @override
-  State<AdminRecipesTab> createState() => _AdminRecipesTabState();
-}
-
-class _AdminRecipesTabState extends State<AdminRecipesTab> {
-  final _search = TextEditingController();
-  List<Recipe> _recipes = const [];
-  bool _loading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
-  void dispose() {
-    _search.dispose();
-    super.dispose();
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    try {
-      final recipes = await context.read<RecipeShareServices>().admin.getAllRecipes();
-      if (!mounted) return;
-      setState(() {
-        _recipes = recipes;
-        _loading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _loading = false;
-      });
-    }
-  }
-
-  Future<void> _toggleFeatured(Recipe recipe, bool nextFeatured) async {
-    try {
-      await context.read<RecipeShareServices>().admin.setRecipeFeatured(recipe.id, nextFeatured);
-      if (!mounted) return;
-      await _load();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            nextFeatured
-                ? 'Recipe marked as featured.'
-                : 'Recipe removed from featured.',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-    }
-  }
-
-  List<Recipe> get _filteredRecipes {
-    final query = _search.text.trim().toLowerCase();
-    if (query.isEmpty) return _recipes;
-    return _recipes
-        .where((recipe) => recipe.title.toLowerCase().contains(query))
-        .toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(_error!, style: const TextStyle(color: AppColors.error)),
-              const SizedBox(height: 16),
-              FilledButton(onPressed: _load, child: const Text('Retry')),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final rows = _filteredRecipes;
-
-    return RefreshIndicator(
-      onRefresh: _load,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        children: [
-          TextField(
-            controller: _search,
-            onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              labelText: 'Search recipes',
-              prefixIcon: Icon(Icons.search),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          if (rows.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(24),
-              child: Text('No recipes found.'),
-            )
-          else
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return Scrollbar(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minWidth: constraints.maxWidth),
-                      child: DataTable(
-                        columns: const [
-                          DataColumn(label: Text('ID')),
-                          DataColumn(label: Text('Title')),
-                          DataColumn(label: Text('Author')),
-                          DataColumn(label: Text('Featured')),
-                          DataColumn(label: Text('Actions')),
-                        ],
-                        rows: rows.map((recipe) {
-                          return DataRow(
-                            cells: [
-                              DataCell(Text(recipe.id)),
-                              DataCell(Text(recipe.title)),
-                              DataCell(Text(recipe.authorUsername ?? '-')),
-                              DataCell(
-                                Switch(
-                                  value: recipe.isFeature,
-                                  onChanged: (value) => _toggleFeatured(recipe, value),
-                                ),
-                              ),
-                              DataCell(
-                                TextButton(
-                                  onPressed: () => _toggleFeatured(recipe, !recipe.isFeature),
-                                  child: Text(recipe.isFeature ? 'Unfeature' : 'Feature'),
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-        ],
       ),
     );
   }
