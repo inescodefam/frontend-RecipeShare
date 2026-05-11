@@ -4,9 +4,13 @@ import 'package:shared/shared.dart';
 /// Holds the signed-in [User] and talks to [AuthService] (mock now, HTTP later).
 
 class AuthProvider extends ChangeNotifier {
-  AuthProvider(this._auth);
+  AuthProvider(
+    this._auth, {
+    this.onBeforeLogout,
+  });
 
   final AuthService _auth;
+  final Future<void> Function()? onBeforeLogout;
 
   User? _user;
   bool _loading = false;
@@ -73,6 +77,11 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _loading = true;
     notifyListeners();
+    if (onBeforeLogout != null) {
+      try {
+        await onBeforeLogout!();
+      } catch (_) {}
+    }
     await _auth.logout();
     _user = null;
     _errorMessage = null;
