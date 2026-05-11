@@ -9,37 +9,85 @@ class HttpAdminService implements AdminService {
 
   final Dio _dio;
 
-  _RecipeCursorPage _mapRecipePage(Map<String, dynamic> data) {
-    final raw = data['items'] as List<dynamic>? ?? const [];
-    final items = raw
-        .map((e) => Recipe.fromApiSummary(e as Map<String, dynamic>))
-        .toList();
-    final next = data['nextCursor'];
-    final nextCursor = next is int ? next : int.tryParse('$next');
-    final hasMore = data['hasMore'] as bool? ?? false;
-    return _RecipeCursorPage(items: items, hasMore: hasMore, nextCursor: nextCursor);
+  Future<T> _request<T>(Future<T> Function() run) async {
+    try {
+      return await run();
+    } on DioException catch (e) {
+      throw StateError(messageFromDio(e));
+    }
+  }
+
+  @override
+  Future<PagedResponse<AdminRecipeListItem>> getAdminRecipes({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+    bool? isDeleted,
+    bool? isFeatured,
+  }) {
+    return _request(() async {
+      final res = await _dio.get<Map<String, dynamic>>(
+        '/api/admin/recipes',
+        queryParameters: <String, dynamic>{
+          'PageNumber': pageNumber,
+          'PageSize': pageSize,
+          if (search != null && search.trim().isNotEmpty) 'Search': search.trim(),
+          if (isDeleted != null) 'IsDeleted': isDeleted,
+          if (isFeatured != null) 'IsFeatured': isFeatured,
+        },
+      );
+      return PagedResponse.fromJson(
+        res.data ?? const <String, dynamic>{},
+        AdminRecipeListItem.fromJson,
+      );
+    });
+  }
+
+  @override
+  Future<AdminRecipeDetail> getAdminRecipeById(int id) {
+    return _request(() async {
+      final res = await _dio.get<Map<String, dynamic>>('/api/admin/recipes/$id');
+      return AdminRecipeDetail.fromJson(res.data ?? const <String, dynamic>{});
+    });
   }
 
   @override
   Future<List<Recipe>> getAllRecipes() async {
     final all = <Recipe>[];
-    int? cursor;
-    bool hasMore = true;
+    var page = 1;
+    var hasNext = true;
 
-    while (hasMore) {
-      final res = await _dio.get<Map<String, dynamic>>(
-        '/api/recipes',
-        queryParameters: <String, dynamic>{
-          'pageSize': 50,
-          if (cursor != null) 'cursor': cursor,
-        },
-      );
-      final data = res.data ?? const <String, dynamic>{};
-      final page = _mapRecipePage(data);
-      all.addAll(page.items);
-      hasMore = page.hasMore;
-      cursor = page.nextCursor;
-      if (cursor == null) break;
+    while (hasNext) {
+      final pageResult = await getAdminRecipes(pageNumber: page, pageSize: 50);
+      for (final item in pageResult.items) {
+        all.add(
+          Recipe(
+            id: '${item.id}',
+            userId: '${item.authorId}',
+            title: item.title,
+            description: '',
+            photoUrl: item.imageUrl ?? '',
+            prepTime: 0,
+            cookTime: 0,
+            servings: 1,
+            difficulty: item.difficulty,
+            categoryId: '0',
+            tagIds: const [],
+            isFeature: item.isFeatured,
+            likesCount: item.likeCount,
+            averageRating: item.averageRating,
+            ratingCount: item.ratingCount,
+            commentCount: item.commentCount,
+            createdAt: item.createdAt,
+            ingredients: const [],
+            steps: const [],
+            categoryLabel: item.categoryName,
+            authorUsername: item.authorUsername,
+          ),
+        );
+      }
+      hasNext = pageResult.hasNextPage;
+      page += 1;
     }
 
     return all;
@@ -47,14 +95,127 @@ class HttpAdminService implements AdminService {
 
   @override
   Future<void> setRecipeFeatured(String recipeId, bool featured) async {
-    final path = featured
-        ? '/api/recipes/$recipeId/feature'
-        : '/api/recipes/$recipeId/unfeature';
-    try {
-      await _dio.patch<void>(path);
-    } on DioException catch (e) {
-      throw StateError(messageFromDio(e));
-    }
+    await _request(() async {
+      final detail = await getAdminRecipeById(int.parse(recipeId));
+      if (detail.isFeatured == featured) return;
+      await _dio.patch<void>('/api/admin/recipes/$recipeId/featured');
+    });
+  }
+
+  @override
+  Future<void> deleteRecipe(String recipeId) async {
+    await _request(() => _dio.delete<void>('/api/admin/recipes/$recipeId'));
+  }
+
+  @override
+  Future<void> restoreRecipe(String recipeId) async {
+    await _request(() => _dio.post<void>('/api/admin/recipes/$recipeId/restore'));
+  }
+
+  @override
+  Future<void> deleteComment(String commentId) async {
+    await _request(() => _dio.delete<void>('/api/admin/comments/$commentId'));
+  }
+
+  @override
+  Future<void> restoreComment(String commentId) async {
+    await _request(() => _dio.post<void>('/api/admin/comments/$commentId/restore'));
+  }
+
+  @override
+  Future<PagedResponse<AdminUserListItem>> getAdminUsers({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+  }) {
+    return _request(() async {
+      final res = await _dio.get<Map<String, dynamic>>(
+        '/api/admin/users',
+        queryParameters: <String, dynamic>{
+          'PageNumber': pageNumber,
+          'PageSize': pageSize,
+          if (search != null && search.trim().isNotEmpty) 'Search': search.trim(),
+        },
+      );
+      return PagedResponse.fromJson(
+        res.data ?? const <String, dynamic>{},
+        AdminUserListItem.fromJson,
+      );
+    });
+  }
+
+  @override
+  Future<void> setUserBlocked(String userId, bool blocked) async {
+    await toggleUserBlocked(userId);
+  }
+
+  @override
+  Future<void> toggleUserBlocked(String userId) async {
+    await _request(() => _dio.patch<void>('/api/admin/users/$userId/blocked'));
+  }
+
+  @override
+  Future<void> deleteUser(String userId) async {
+    await _request(() => _dio.delete<void>('/api/admin/users/$userId'));
+  }
+
+  @override
+  Future<void> restoreUser(String userId) async {
+    await _request(() => _dio.post<void>('/api/admin/users/$userId/restore'));
+  }
+
+  @override
+  Future<PagedResponse<AdminReportSummary>> getAdminReports({
+    int pageNumber = 1,
+    int pageSize = 20,
+    ReportStatus? status,
+  }) {
+    return _request(() async {
+      final res = await _dio.get<Map<String, dynamic>>(
+        '/api/admin/reports',
+        queryParameters: <String, dynamic>{
+          'PageNumber': pageNumber,
+          'PageSize': pageSize,
+          if (status != null) 'ReportStatus': reportStatusToApi(status),
+        },
+      );
+      return PagedResponse.fromJson(
+        res.data ?? const <String, dynamic>{},
+        AdminReportSummary.fromJson,
+      );
+    });
+  }
+
+  @override
+  Future<AdminReportDetail> getAdminReportById(int id) {
+    return _request(() async {
+      final res = await _dio.get<Map<String, dynamic>>('/api/admin/reports/$id');
+      return AdminReportDetail.fromJson(res.data ?? const <String, dynamic>{});
+    });
+  }
+
+  @override
+  Future<void> resolveAdminReport(
+    int id, {
+    required AdminAction contentAction,
+    required AdminAction userAction,
+    String? adminNote,
+  }) async {
+    await _request(
+      () => _dio.patch<void>(
+        '/api/admin/reports/$id/resolve',
+        data: <String, dynamic>{
+          'contentAction': adminActionToApi(contentAction),
+          'userAction': adminActionToApi(userAction),
+          if (adminNote != null && adminNote.trim().isNotEmpty) 'adminNote': adminNote.trim(),
+        },
+      ),
+    );
+  }
+
+  @override
+  Future<void> dismissAdminReport(int id) async {
+    await _request(() => _dio.patch<void>('/api/admin/reports/$id/dismiss'));
   }
 
   @override
@@ -84,19 +245,6 @@ class HttpAdminService implements AdminService {
   Future<List<Report>> getAllReports() async => throw UnimplementedError();
 
   @override
-  Future<void> setUserBlocked(String userId, bool blocked) async =>
-      throw UnimplementedError();
-
-  @override
-  Future<void> deleteUser(String userId) async => throw UnimplementedError();
-
-  @override
-  Future<void> deleteRecipe(String recipeId) async => throw UnimplementedError();
-
-  @override
-  Future<void> deleteComment(String commentId) async => throw UnimplementedError();
-
-  @override
   Future<void> updateReportStatus(String reportId, ReportStatus status) async =>
       throw UnimplementedError();
 
@@ -124,16 +272,4 @@ class HttpAdminService implements AdminService {
     required String intoTagId,
   }) async =>
       throw UnimplementedError();
-}
-
-class _RecipeCursorPage {
-  const _RecipeCursorPage({
-    required this.items,
-    required this.hasMore,
-    required this.nextCursor,
-  });
-
-  final List<Recipe> items;
-  final bool hasMore;
-  final int? nextCursor;
 }
