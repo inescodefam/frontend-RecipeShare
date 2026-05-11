@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
 import '../providers/auth_provider.dart';
+import '../widgets/report_content_dialog.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   const RecipeDetailScreen({
@@ -173,6 +174,55 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     }
   }
 
+  Future<void> _submitReport({
+    required ReportTargetType targetType,
+    required String targetId,
+    required String title,
+  }) async {
+    final parsedTargetId = int.tryParse(targetId);
+    if (parsedTargetId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to report this content.')),
+      );
+      return;
+    }
+
+    final request = await showReportContentDialog(context, title: title);
+    if (request == null || !mounted) return;
+
+    try {
+      await context.read<RecipeShareServices>().reports.submitContentReport(
+            targetType: targetType,
+            targetId: parsedTargetId,
+            reason: request.reason,
+            description: request.description,
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Report submitted. Thank you.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _reportRecipe(Recipe recipe) async {
+    await _submitReport(
+      targetType: ReportTargetType.recipe,
+      targetId: recipe.id,
+      title: 'Report recipe',
+    );
+  }
+
+  Future<void> _reportComment(Comment comment) async {
+    await _submitReport(
+      targetType: ReportTargetType.comment,
+      targetId: comment.id,
+      title: 'Report comment',
+    );
+  }
+
   Future<void> _deleteComment(String commentId) async {
     try {
       await context.read<RecipeShareServices>().comments.deleteComment(commentId);
@@ -288,6 +338,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               onPressed: _goBackOrFeed,
             ),
             actions: [
+              if (vm.currentUserId != null && !isOwner)
+                IconButton(
+                  tooltip: 'Report recipe',
+                  onPressed: () => _reportRecipe(recipe),
+                  icon: const Icon(Icons.flag_outlined),
+                ),
               if (isOwner)
                 PopupMenuButton<String>(
                   onSelected: (value) async {
@@ -449,12 +505,23 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                             ),
                             title: Text(comment.authorUsername ?? 'Unknown user'),
                             subtitle: Text(comment.content),
-                            trailing: vm.currentUserId == comment.userId
-                                ? IconButton(
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (vm.currentUserId != null &&
+                                    vm.currentUserId != comment.userId)
+                                  IconButton(
+                                    tooltip: 'Report comment',
+                                    icon: const Icon(Icons.flag_outlined),
+                                    onPressed: () => _reportComment(comment),
+                                  ),
+                                if (vm.currentUserId == comment.userId)
+                                  IconButton(
                                     icon: const Icon(Icons.delete_outline_rounded),
                                     onPressed: () => _deleteComment(comment.id),
-                                  )
-                                : null,
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

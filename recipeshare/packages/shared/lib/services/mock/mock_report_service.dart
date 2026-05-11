@@ -13,6 +13,27 @@ class MockReportService implements ReportService {
   }
 
   @override
+  Future<void> submitContentReport({
+    required ReportTargetType targetType,
+    required int targetId,
+    required ReportReason reason,
+    String? description,
+  }) async {
+    await submitReport(
+      Report(
+        id: 'rep_${DateTime.now().millisecondsSinceEpoch}',
+        reporterUserId: 'mock_reporter',
+        targetType: targetType,
+        targetId: '$targetId',
+        reason: reason,
+        description: description,
+        status: ReportStatus.pending,
+        createdAt: DateTime.now().toUtc(),
+      ),
+    );
+  }
+
+  @override
   Future<List<Report>> getPendingReports() async {
     final all = await _data.getReports();
     return all.where((r) => r.status == ReportStatus.pending).toList();
