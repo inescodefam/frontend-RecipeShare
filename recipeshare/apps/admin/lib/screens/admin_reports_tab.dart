@@ -269,7 +269,7 @@ class _ReportDetailDialogState extends State<_ReportDetailDialog> {
                     if (canModerate) ...[
                       const SizedBox(height: 16),
                       DropdownButtonFormField<AdminAction>(
-                        key: ValueKey(_contentAction),
+                        key: ValueKey('content-action-${_contentAction.name}'),
                         initialValue: _contentAction,
                         decoration: const InputDecoration(
                           labelText: 'Content action',
@@ -287,7 +287,7 @@ class _ReportDetailDialogState extends State<_ReportDetailDialog> {
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<AdminAction>(
-                        key: ValueKey(_userAction),
+                        key: ValueKey('user-action-${_userAction.name}'),
                         initialValue: _userAction,
                         decoration: const InputDecoration(
                           labelText: 'User action',

@@ -205,8 +205,8 @@ class HttpAdminService implements AdminService {
       () => _dio.patch<void>(
         '/api/admin/reports/$id/resolve',
         data: <String, dynamic>{
-          'contentAction': adminActionToApi(contentAction),
-          'userAction': adminActionToApi(userAction),
+          'contentAction': adminActionToApiValue(contentAction),
+          'userAction': adminActionToApiValue(userAction),
           if (adminNote != null && adminNote.trim().isNotEmpty) 'adminNote': adminNote.trim(),
         },
       ),
