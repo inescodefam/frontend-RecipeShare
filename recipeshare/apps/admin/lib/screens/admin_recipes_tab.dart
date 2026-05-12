@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
+import '../widgets/admin_moderation_detail_dialogs.dart';
+
 class AdminRecipesTab extends StatefulWidget {
   const AdminRecipesTab({super.key});
 
@@ -104,6 +106,13 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
     }
   }
 
+  Future<void> _openRecipeDetail(AdminRecipeListItem recipe) async {
+    final updated = await showAdminRecipeDetailDialog(context, recipeId: recipe.id);
+    if (updated && mounted) {
+      await _load(page: _page);
+    }
+  }
+
   Future<void> _showComments(AdminRecipeListItem recipe) async {
     try {
       final detail = await context
@@ -197,6 +206,7 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
                       constraints: BoxConstraints(minWidth: constraints.maxWidth),
                       child: DataTable(
                         columns: const [
+                          DataColumn(label: Text('View details')),
                           DataColumn(label: Text('ID')),
                           DataColumn(label: Text('Title')),
                           DataColumn(label: Text('Author')),
@@ -207,6 +217,12 @@ class _AdminRecipesTabState extends State<AdminRecipesTab> {
                         rows: _recipes.map((recipe) {
                           return DataRow(
                             cells: [
+                              DataCell(
+                                TextButton(
+                                  onPressed: () => _openRecipeDetail(recipe),
+                                  child: const Text('View'),
+                                ),
+                              ),
                               DataCell(Text('${recipe.id}')),
                               DataCell(Text(recipe.title)),
                               DataCell(Text(recipe.authorUsername)),
