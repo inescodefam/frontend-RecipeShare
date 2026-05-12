@@ -309,6 +309,81 @@ class MockAdminService implements AdminService {
   }
 
   @override
+  Future<AdminUserDetail> getAdminUserById(int id) async {
+    final users = await _data.getUsers();
+    final user = users.firstWhere(
+      (item) => int.tryParse(item.id) == id,
+      orElse: () => throw StateError('User not found: $id'),
+    );
+    final recipes = await _data.getRecipes();
+    final ownedRecipes = recipes.where((recipe) => recipe.userId == user.id).toList();
+    return AdminUserDetail(
+      id: int.tryParse(user.id) ?? id,
+      username: user.username,
+      email: user.email,
+      profileImageUrl: user.profileImageUrl.isEmpty ? null : user.profileImageUrl,
+      createdAt: DateTime.now(),
+      isBlocked: user.isBlocked,
+      isDeleted: false,
+      recipeCount: ownedRecipes.length,
+      commentCount: 0,
+      likeCount: ownedRecipes.fold<int>(0, (sum, recipe) => sum + recipe.likesCount),
+      ratingCount: ownedRecipes.fold<int>(0, (sum, recipe) => sum + recipe.ratingCount),
+      followerCount: user.followersCount,
+      followingCount: user.followingCount,
+    );
+  }
+
+  @override
+  Future<AdminDashboardStats> getAdminDashboard() async {
+    final users = await _data.getUsers();
+    final recipes = await _data.getRecipes();
+    final activeUsers = [...users]..sort((a, b) => b.recipesCount.compareTo(a.recipesCount));
+    final popularRecipes = [...recipes]..sort((a, b) => b.likesCount.compareTo(a.likesCount));
+
+    final topUsers = <AdminUserDetail>[];
+    for (final user in activeUsers.take(10)) {
+      final userId = int.tryParse(user.id);
+      if (userId == null) continue;
+      topUsers.add(await getAdminUserById(userId));
+    }
+
+    final topRecipes = <AdminRecipeListItem>[];
+    for (final recipe in popularRecipes.take(10)) {
+      final recipeId = int.tryParse(recipe.id);
+      if (recipeId == null) continue;
+      final detail = await getAdminRecipeById(recipeId);
+      topRecipes.add(
+        AdminRecipeListItem(
+          id: detail.id,
+          title: detail.title,
+          imageUrl: detail.imageUrl,
+          isFeatured: detail.isFeatured,
+          isDeleted: detail.isDeleted,
+          deletedAt: detail.deletedAt,
+          createdAt: detail.createdAt,
+          difficulty: detail.difficulty,
+          authorUsername: detail.authorUsername,
+          authorId: detail.authorId,
+          categoryName: detail.categoryName,
+          likeCount: detail.likeCount,
+          commentCount: detail.commentCount,
+          averageRating: detail.averageRating,
+          ratingCount: detail.ratingCount,
+        ),
+      );
+    }
+
+    return AdminDashboardStats(
+      totalUsers: users.length,
+      totalRecipes: recipes.length,
+      pendingReports: await getPendingReportCount(),
+      mostActiveUsers: topUsers,
+      mostPopularRecipes: topRecipes,
+    );
+  }
+
+  @override
   Future<void> updateReportStatus(String reportId, ReportStatus status) async {
     final reports = await _data.getReports();
     Report? found;

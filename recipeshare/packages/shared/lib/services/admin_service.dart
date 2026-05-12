@@ -73,6 +73,10 @@ abstract class AdminService {
 
   Future<void> dismissAdminReport(int id);
 
+  Future<AdminDashboardStats> getAdminDashboard();
+
+  Future<AdminUserDetail> getAdminUserById(int id);
+
   Future<void> updateReportStatus(String reportId, ReportStatus status);
 
   Future<Map<String, int>> getRecipeCountByCategory();
