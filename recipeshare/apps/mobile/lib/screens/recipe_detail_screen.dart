@@ -21,6 +21,7 @@ class RecipeDetailScreen extends StatefulWidget {
 
 class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
   late Future<_DetailVm> _future;
+  final Set<String> _sessionReportedTargetKeys = {};
 
   void _goBackOrFeed() {
     if (context.canPop()) {
@@ -73,13 +74,83 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       author = await services.users.getUserById(recipe.userId);
     }
 
+    final reportedTargetKeys = await _reportedTargetKeysForContent(
+      services: services,
+      currentUserId: currentUserId,
+      recipe: recipe,
+      comments: commentPage.items,
+    );
+
     return _DetailVm(
       recipe: recipe,
       author: author,
       comments: commentPage.items,
       collections: collections,
       currentUserId: currentUserId,
+      reportedTargetKeys: reportedTargetKeys,
     );
+  }
+
+  String _contentReportKey(ReportTargetType targetType, String targetId) {
+    return '${targetType.name}:$targetId';
+  }
+
+  Future<Set<String>> _reportedTargetKeysForContent({
+    required RecipeShareServices services,
+    required String? currentUserId,
+    required Recipe recipe,
+    required List<Comment> comments,
+  }) async {
+    if (currentUserId == null) return const {};
+
+    final keys = <String>{};
+    final recipeTargetId = int.tryParse(recipe.id);
+    if (recipeTargetId != null &&
+        await services.reports.hasReported(
+          reporterUserId: currentUserId,
+          targetType: ReportTargetType.recipe,
+          targetId: recipeTargetId,
+        )) {
+      keys.add(_contentReportKey(ReportTargetType.recipe, recipe.id));
+    }
+
+    for (final comment in comments) {
+      final commentTargetId = int.tryParse(comment.id);
+      if (commentTargetId == null) continue;
+      if (await services.reports.hasReported(
+        reporterUserId: currentUserId,
+        targetType: ReportTargetType.comment,
+        targetId: commentTargetId,
+      )) {
+        keys.add(_contentReportKey(ReportTargetType.comment, comment.id));
+      }
+    }
+
+    return keys;
+  }
+
+  bool _hasReportedContent(
+    ReportTargetType targetType,
+    String targetId,
+    Set<String> reportedTargetKeys,
+  ) {
+    final key = _contentReportKey(targetType, targetId);
+    return reportedTargetKeys.contains(key) || _sessionReportedTargetKeys.contains(key);
+  }
+
+  void _markContentReported(ReportTargetType targetType, String targetId) {
+    setState(() {
+      _sessionReportedTargetKeys.add(_contentReportKey(targetType, targetId));
+    });
+  }
+
+  String _messageFromError(Object error) {
+    if (error is StateError) return error.message;
+    return error.toString();
+  }
+
+  bool _isDuplicateReportError(Object error) {
+    return _messageFromError(error).toLowerCase().contains('already reported');
   }
 
   Future<void> _confirmDeleteRecipe(RecipeShareServices services, String id) async {
@@ -178,6 +249,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     required ReportTargetType targetType,
     required String targetId,
     required String title,
+    required Set<String> reportedTargetKeys,
   }) async {
     final parsedTargetId = int.tryParse(targetId);
     if (parsedTargetId == null) {
@@ -187,39 +259,62 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
       return;
     }
 
+    if (_hasReportedContent(targetType, targetId, reportedTargetKeys)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(ReportService.duplicateReportMessage)),
+      );
+      return;
+    }
+
     final request = await showReportContentDialog(context, title: title);
     if (request == null || !mounted) return;
 
+    final currentUserId = context.read<AuthProvider>().user?.id;
     try {
       await context.read<RecipeShareServices>().reports.submitContentReport(
             targetType: targetType,
             targetId: parsedTargetId,
             reason: request.reason,
             description: request.description,
+            reporterUserId: currentUserId,
           );
       if (!mounted) return;
+      _markContentReported(targetType, targetId);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Report submitted. Thank you.')),
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (_isDuplicateReportError(e)) {
+        _markContentReported(targetType, targetId);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_messageFromError(e))),
+      );
     }
   }
 
-  Future<void> _reportRecipe(Recipe recipe) async {
+  Future<void> _reportRecipe(
+    Recipe recipe,
+    Set<String> reportedTargetKeys,
+  ) async {
     await _submitReport(
       targetType: ReportTargetType.recipe,
       targetId: recipe.id,
       title: 'Report recipe',
+      reportedTargetKeys: reportedTargetKeys,
     );
   }
 
-  Future<void> _reportComment(Comment comment) async {
+  Future<void> _reportComment(
+    Comment comment,
+    Set<String> reportedTargetKeys,
+  ) async {
     await _submitReport(
       targetType: ReportTargetType.comment,
       targetId: comment.id,
       title: 'Report comment',
+      reportedTargetKeys: reportedTargetKeys,
     );
   }
 
@@ -325,9 +420,17 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
         final author = vm.author;
         final comments = vm.comments;
         final collections = vm.collections;
+        final reportedTargetKeys = vm.reportedTargetKeys;
         final services = context.read<RecipeShareServices>();
         final isOwner =
             vm.currentUserId != null && vm.currentUserId == recipe.userId;
+        final canReportRecipe = vm.currentUserId != null &&
+            !isOwner &&
+            !_hasReportedContent(
+              ReportTargetType.recipe,
+              recipe.id,
+              reportedTargetKeys,
+            );
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -338,10 +441,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               onPressed: _goBackOrFeed,
             ),
             actions: [
-              if (vm.currentUserId != null && !isOwner)
+              if (canReportRecipe)
                 IconButton(
                   tooltip: 'Report recipe',
-                  onPressed: () => _reportRecipe(recipe),
+                  onPressed: () => _reportRecipe(recipe, reportedTargetKeys),
                   icon: const Icon(Icons.flag_outlined),
                 ),
               if (isOwner)
@@ -509,11 +612,17 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (vm.currentUserId != null &&
-                                    vm.currentUserId != comment.userId)
+                                    vm.currentUserId != comment.userId &&
+                                    !_hasReportedContent(
+                                      ReportTargetType.comment,
+                                      comment.id,
+                                      reportedTargetKeys,
+                                    ))
                                   IconButton(
                                     tooltip: 'Report comment',
                                     icon: const Icon(Icons.flag_outlined),
-                                    onPressed: () => _reportComment(comment),
+                                    onPressed: () =>
+                                        _reportComment(comment, reportedTargetKeys),
                                   ),
                                 if (vm.currentUserId == comment.userId)
                                   IconButton(
@@ -622,6 +731,7 @@ class _DetailVm {
     required this.comments,
     required this.collections,
     required this.currentUserId,
+    required this.reportedTargetKeys,
   });
 
   final Recipe recipe;
@@ -629,5 +739,6 @@ class _DetailVm {
   final List<Comment> comments;
   final List<Collection> collections;
   final String? currentUserId;
+  final Set<String> reportedTargetKeys;
 }
 

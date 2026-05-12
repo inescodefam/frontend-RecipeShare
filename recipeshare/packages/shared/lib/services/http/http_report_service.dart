@@ -15,6 +15,7 @@ class HttpReportService implements ReportService {
     required int targetId,
     required ReportReason reason,
     String? description,
+    String? reporterUserId,
   }) async {
     try {
       await _dio.post<void>(
@@ -45,6 +46,14 @@ class HttpReportService implements ReportService {
       description: report.description,
     );
   }
+
+  @override
+  Future<bool> hasReported({
+    required String reporterUserId,
+    required ReportTargetType targetType,
+    required int targetId,
+  }) async =>
+      false;
 
   @override
   Future<List<Report>> getPendingReports() async => throw UnimplementedError();
