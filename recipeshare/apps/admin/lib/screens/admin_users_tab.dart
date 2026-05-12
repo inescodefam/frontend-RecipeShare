@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
 import '../providers/auth_provider.dart';
+import '../widgets/admin_moderation_detail_dialogs.dart';
 import 'admin_recipes_tab.dart';
 
 class AdminUsersTab extends StatefulWidget {
@@ -67,6 +68,13 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
     final currentUserId = context.read<AuthProvider>().user?.id;
     if (currentUserId == null) return false;
     return currentUserId == '${user.id}';
+  }
+
+  Future<void> _openUserDetail(AdminUserListItem user) async {
+    final updated = await showAdminUserDetailDialog(context, userId: user.id);
+    if (updated && mounted) {
+      await _load(page: _page);
+    }
   }
 
   Future<void> _toggleBlocked(AdminUserListItem user) async {
@@ -188,6 +196,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                       constraints: BoxConstraints(minWidth: constraints.maxWidth),
                       child: DataTable(
                         columns: const [
+                          DataColumn(label: Text('View details')),
                           DataColumn(label: Text('ID')),
                           DataColumn(label: Text('Username')),
                           DataColumn(label: Text('Email')),
@@ -200,6 +209,12 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                               currentUserId != null && currentUserId == '${user.id}';
                           return DataRow(
                             cells: [
+                              DataCell(
+                                TextButton(
+                                  onPressed: () => _openUserDetail(user),
+                                  child: const Text('View'),
+                                ),
+                              ),
                               DataCell(Text('${user.id}')),
                               DataCell(Text(user.username)),
                               DataCell(Text(user.email)),
