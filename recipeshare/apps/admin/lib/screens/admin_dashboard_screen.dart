@@ -6,6 +6,7 @@ import 'package:shared/shared.dart';
 import '../providers/auth_provider.dart';
 import 'admin_recipes_tab.dart';
 import 'admin_reports_tab.dart';
+import 'admin_statistics_tab.dart';
 import 'admin_users_tab.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -50,9 +51,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ],
       ),
-      body: categoriesApi == null || tagsApi == null
-          ? const _ApiRequiredMessage()
-          : Row(
+      body: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 NavigationRail(
@@ -69,6 +68,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   },
                   labelType: NavigationRailLabelType.all,
                   destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.insights_outlined),
+                      selectedIcon: Icon(Icons.insights),
+                      label: Text('Statistics'),
+                    ),
                     NavigationRailDestination(
                       icon: Icon(Icons.category_outlined),
                       selectedIcon: Icon(Icons.category),
@@ -109,14 +113,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             index: _navIndex,
                             sizing: StackFit.expand,
                             children: [
-                              AdminCatalogTab(
-                                api: categoriesApi,
-                                singular: 'Category',
-                              ),
-                              AdminCatalogTab(
-                                api: tagsApi,
-                                singular: 'Tag',
-                              ),
+                              const AdminStatisticsTab(),
+                              categoriesApi == null
+                                  ? const _ApiRequiredMessage()
+                                  : AdminCatalogTab(
+                                      api: categoriesApi,
+                                      singular: 'Category',
+                                    ),
+                              tagsApi == null
+                                  ? const _ApiRequiredMessage()
+                                  : AdminCatalogTab(
+                                      api: tagsApi,
+                                      singular: 'Tag',
+                                    ),
                               const AdminRecipesTab(),
                               const AdminUsersTab(),
                               const AdminReportsTab(),
@@ -144,8 +153,8 @@ class _ApiRequiredMessage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'Admin moderation requires the real API. Run the admin app without '
-            'USE_MOCK_DATA (default) and point API_BASE_URL at your backend.',
+            'Category and tag management requires the real API. Run the admin app '
+            'without USE_MOCK_DATA (default) and point API_BASE_URL at your backend.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppColors.textSecondary,
                 ),
