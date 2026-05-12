@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
+import '../widgets/admin_moderation_detail_dialogs.dart';
+
 class AdminStatisticsTab extends StatefulWidget {
   const AdminStatisticsTab({super.key});
 
@@ -38,6 +40,20 @@ class _AdminStatisticsTabState extends State<AdminStatisticsTab> {
         _error = e.toString();
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _openUserDetail(AdminUserDetail user) async {
+    final updated = await showAdminUserDetailDialog(context, userId: user.id);
+    if (updated && mounted) {
+      await _load();
+    }
+  }
+
+  Future<void> _openRecipeDetail(AdminRecipeListItem recipe) async {
+    final updated = await showAdminRecipeDetailDialog(context, recipeId: recipe.id);
+    if (updated && mounted) {
+      await _load();
     }
   }
 
@@ -115,7 +131,10 @@ class _AdminStatisticsTabState extends State<AdminStatisticsTab> {
           if (stats.mostActiveUsers.isEmpty)
             const Text('No active users yet.')
           else
-            _UsersTable(users: stats.mostActiveUsers),
+            _UsersTable(
+              users: stats.mostActiveUsers,
+              onUserTap: _openUserDetail,
+            ),
           const SizedBox(height: 32),
           Text(
             'Most popular recipes',
@@ -132,7 +151,10 @@ class _AdminStatisticsTabState extends State<AdminStatisticsTab> {
           if (stats.mostPopularRecipes.isEmpty)
             const Text('No recipes yet.')
           else
-            _RecipesTable(recipes: stats.mostPopularRecipes),
+            _RecipesTable(
+              recipes: stats.mostPopularRecipes,
+              onRecipeTap: _openRecipeDetail,
+            ),
         ],
       ),
     );
@@ -184,9 +206,13 @@ class _MetricCard extends StatelessWidget {
 }
 
 class _UsersTable extends StatelessWidget {
-  const _UsersTable({required this.users});
+  const _UsersTable({
+    required this.users,
+    required this.onUserTap,
+  });
 
   final List<AdminUserDetail> users;
+  final ValueChanged<AdminUserDetail> onUserTap;
 
   @override
   Widget build(BuildContext context) {
@@ -198,6 +224,7 @@ class _UsersTable extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
+                showCheckboxColumn: false,
                 columns: const [
                   DataColumn(label: Text('Username')),
                   DataColumn(label: Text('Email')),
@@ -208,6 +235,7 @@ class _UsersTable extends StatelessWidget {
                 ],
                 rows: users.map((user) {
                   return DataRow(
+                    onSelectChanged: (_) => onUserTap(user),
                     cells: [
                       DataCell(Text(user.username)),
                       DataCell(Text(user.email)),
@@ -228,9 +256,13 @@ class _UsersTable extends StatelessWidget {
 }
 
 class _RecipesTable extends StatelessWidget {
-  const _RecipesTable({required this.recipes});
+  const _RecipesTable({
+    required this.recipes,
+    required this.onRecipeTap,
+  });
 
   final List<AdminRecipeListItem> recipes;
+  final ValueChanged<AdminRecipeListItem> onRecipeTap;
 
   @override
   Widget build(BuildContext context) {
@@ -242,6 +274,7 @@ class _RecipesTable extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
+                showCheckboxColumn: false,
                 columns: const [
                   DataColumn(label: Text('Title')),
                   DataColumn(label: Text('Author')),
@@ -252,6 +285,7 @@ class _RecipesTable extends StatelessWidget {
                 ],
                 rows: recipes.map((recipe) {
                   return DataRow(
+                    onSelectChanged: (_) => onRecipeTap(recipe),
                     cells: [
                       DataCell(Text(recipe.title)),
                       DataCell(Text(recipe.authorUsername)),
