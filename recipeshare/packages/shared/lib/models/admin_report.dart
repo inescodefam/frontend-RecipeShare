@@ -157,6 +157,19 @@ String adminActionToApi(AdminAction action) {
   }
 }
 
+int adminActionToApiValue(AdminAction action) {
+  switch (action) {
+    case AdminAction.none:
+      return 0;
+    case AdminAction.warning:
+      return 1;
+    case AdminAction.block:
+      return 2;
+    case AdminAction.softDelete:
+      return 3;
+  }
+}
+
 String reportStatusToApi(ReportStatus status) {
   switch (status) {
     case ReportStatus.pending:

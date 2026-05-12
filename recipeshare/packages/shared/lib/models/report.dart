@@ -78,3 +78,36 @@ class Report {
     };
   }
 }
+
+int reportTargetTypeToApi(ReportTargetType targetType) {
+  switch (targetType) {
+    case ReportTargetType.recipe:
+      return 0;
+    case ReportTargetType.comment:
+      return 1;
+    case ReportTargetType.user:
+      throw ArgumentError('User reports are not supported by the API.');
+  }
+}
+
+int reportReasonToApi(ReportReason reason) {
+  switch (reason) {
+    case ReportReason.spam:
+      return 0;
+    case ReportReason.offensive:
+      return 1;
+    case ReportReason.inappropriate:
+      return 2;
+  }
+}
+
+String reportReasonLabel(ReportReason reason) {
+  switch (reason) {
+    case ReportReason.spam:
+      return 'Spam';
+    case ReportReason.offensive:
+      return 'Offensive content';
+    case ReportReason.inappropriate:
+      return 'Inappropriate content';
+  }
+}

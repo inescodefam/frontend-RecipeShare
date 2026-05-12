@@ -15,6 +15,7 @@ import 'http/http_comment_service.dart';
 import 'http/http_admin_service.dart';
 import 'http/http_device_token_service.dart';
 import 'http/http_recipe_service.dart';
+import 'http/http_report_service.dart';
 import 'http/http_user_service.dart';
 import 'mock/mock_admin_service.dart';
 import 'mock/mock_auth_service.dart';
@@ -76,7 +77,7 @@ class RecipeShareServices {
       comments: HttpCommentService(dio),
       deviceTokens: HttpDeviceTokenService(dio),
       collections: HttpCollectionService(dio),
-      reports: MockReportService(data),
+      reports: HttpReportService(dio),
       admin: HttpAdminService(dio),
     );
   }

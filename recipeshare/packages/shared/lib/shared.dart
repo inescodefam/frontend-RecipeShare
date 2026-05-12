@@ -24,6 +24,7 @@ export 'services/http/http_collection_service.dart';
 export 'services/http/http_comment_service.dart';
 export 'services/http/http_device_token_service.dart';
 export 'services/http/http_recipe_service.dart';
+export 'services/http/http_report_service.dart';
 export 'services/http/http_user_service.dart';
 export 'services/mock/mock_data_service.dart';
 export 'services/mock/mock_auth_service.dart';
