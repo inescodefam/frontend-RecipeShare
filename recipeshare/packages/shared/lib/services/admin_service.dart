@@ -77,6 +77,8 @@ abstract class AdminService {
 
   Future<AdminUserDetail> getAdminUserById(int id);
 
+  Future<List<AdminRecipeListItem>> getAdminRecipesForAuthor(int authorId);
+
   Future<void> updateReportStatus(String reportId, ReportStatus status);
 
   Future<Map<String, int>> getRecipeCountByCategory();

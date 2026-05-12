@@ -1,4 +1,6 @@
 import 'enums.dart';
+import 'ingredient.dart';
+import 'recipe_step.dart';
 
 class AdminRecipeListItem {
   const AdminRecipeListItem({
@@ -126,6 +128,8 @@ class AdminRecipeDetail {
     required this.averageRating,
     required this.ratingCount,
     required this.comments,
+    required this.ingredients,
+    required this.steps,
   });
 
   final int id;
@@ -151,11 +155,20 @@ class AdminRecipeDetail {
   final double averageRating;
   final int ratingCount;
   final List<AdminRecipeCommentItem> comments;
+  final List<Ingredient> ingredients;
+  final List<RecipeStep> steps;
 
   factory AdminRecipeDetail.fromJson(Map<String, dynamic> json) {
     final author = json['author'] as Map<String, dynamic>?;
+    final rid = '${json['id']}';
     final comments = (json['comments'] as List<dynamic>? ?? const [])
         .map((e) => AdminRecipeCommentItem.fromJson(e as Map<String, dynamic>))
+        .toList();
+    final ingredients = (json['ingredients'] as List<dynamic>? ?? const [])
+        .map((e) => Ingredient.fromApiJson(e as Map<String, dynamic>, recipeId: rid))
+        .toList();
+    final steps = (json['steps'] as List<dynamic>? ?? const [])
+        .map((e) => RecipeStep.fromApiJson(e as Map<String, dynamic>, recipeId: rid))
         .toList();
     return AdminRecipeDetail(
       id: json['id'] as int,
@@ -186,6 +199,8 @@ class AdminRecipeDetail {
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
       ratingCount: json['ratingCount'] as int? ?? 0,
       comments: comments,
+      ingredients: ingredients,
+      steps: steps,
     );
   }
 }

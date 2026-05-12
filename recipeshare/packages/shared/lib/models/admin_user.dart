@@ -1,3 +1,6 @@
+import 'ingredient.dart';
+import 'recipe_step.dart';
+
 class AdminUserListItem {
   const AdminUserListItem({
     required this.id,
@@ -35,6 +38,40 @@ class AdminUserListItem {
   }
 }
 
+class AdminUserRecipeItem {
+  const AdminUserRecipeItem({
+    required this.id,
+    required this.title,
+    this.imageUrl,
+    required this.createdAt,
+    required this.isFeatured,
+    required this.isDeleted,
+    this.deletedAt,
+  });
+
+  final int id;
+  final String title;
+  final String? imageUrl;
+  final DateTime createdAt;
+  final bool isFeatured;
+  final bool isDeleted;
+  final DateTime? deletedAt;
+
+  factory AdminUserRecipeItem.fromJson(Map<String, dynamic> json) {
+    return AdminUserRecipeItem(
+      id: json['id'] as int,
+      title: json['title'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      isFeatured: json['isFeatured'] as bool? ?? false,
+      isDeleted: json['isDeleted'] as bool? ?? false,
+      deletedAt: json['deletedAt'] == null
+          ? null
+          : DateTime.parse(json['deletedAt'] as String),
+    );
+  }
+}
+
 class AdminUserDetail {
   const AdminUserDetail({
     required this.id,
@@ -50,6 +87,7 @@ class AdminUserDetail {
     required this.ratingCount,
     required this.followerCount,
     required this.followingCount,
+    this.recentRecipes = const [],
   });
 
   final int id;
@@ -65,8 +103,12 @@ class AdminUserDetail {
   final int ratingCount;
   final int followerCount;
   final int followingCount;
+  final List<AdminUserRecipeItem> recentRecipes;
 
   factory AdminUserDetail.fromJson(Map<String, dynamic> json) {
+    final recentRecipes = (json['recentRecipes'] as List<dynamic>? ?? const [])
+        .map((e) => AdminUserRecipeItem.fromJson(e as Map<String, dynamic>))
+        .toList();
     return AdminUserDetail(
       id: json['id'] as int,
       username: json['username'] as String? ?? '',
@@ -81,6 +123,7 @@ class AdminUserDetail {
       ratingCount: json['ratingCount'] as int? ?? 0,
       followerCount: json['followerCount'] as int? ?? 0,
       followingCount: json['followingCount'] as int? ?? 0,
+      recentRecipes: recentRecipes,
     );
   }
 }
