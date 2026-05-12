@@ -14,13 +14,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late Future<List<Collection>> _collectionsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _collectionsFuture = _loadCollections();
-  }
+  Future<List<Collection>>? _collectionsFuture;
 
   Future<List<Collection>> _loadCollections() {
     final services = context.read<RecipeShareServices>();
@@ -145,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 8),
             FutureBuilder<List<Collection>>(
-              future: _collectionsFuture,
+              future: _collectionsFuture ??= _loadCollections(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(

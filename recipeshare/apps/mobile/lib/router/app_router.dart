@@ -23,9 +23,9 @@ const _homeFeedPath = '/home/feed';
 class AppRouter {
   AppRouter._();
 
-  static GoRouter create(AuthProvider auth) {
+  static GoRouter create(AuthProvider auth, {String? initialLocation}) {
     return GoRouter(
-      initialLocation: _splashPath,
+      initialLocation: initialLocation ?? _splashPath,
       refreshListenable: auth,
 
       redirect: (BuildContext context, GoRouterState state) {

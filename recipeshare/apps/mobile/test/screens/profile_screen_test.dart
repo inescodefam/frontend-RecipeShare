@@ -90,10 +90,7 @@ GoRouter _router(AuthProvider auth) {
     routes: [
       GoRoute(
         path: '/home/profile',
-        builder: (_, __) => ChangeNotifierProvider<AuthProvider>.value(
-          value: auth,
-          child: const Scaffold(body: ProfileScreen()),
-        ),
+        builder: (_, __) => const Scaffold(body: ProfileScreen()),
       ),
       GoRoute(
         path: '/home/profile/settings',
@@ -107,14 +104,26 @@ GoRouter _router(AuthProvider auth) {
   );
 }
 
+Future<void> _pumpProfile(WidgetTester tester, AuthProvider auth) async {
+  final services = RecipeShareServices.mock();
+  await tester.pumpWidget(
+    MultiProvider(
+      providers: [
+        Provider<RecipeShareServices>.value(value: services),
+        ChangeNotifierProvider<AuthProvider>.value(value: auth),
+      ],
+      child: MaterialApp.router(routerConfig: _router(auth)),
+    ),
+  );
+}
+
 void main() {
   testWidgets('renders current user details and settings CTA', (tester) async {
     final service = _AuthServiceForProfile(_user());
     final auth = AuthProvider(service);
     await auth.init();
-    final router = _router(auth);
 
-    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await _pumpProfile(tester, auth);
     await tester.pumpAndSettle();
 
     expect(find.text('Profile'), findsOneWidget);
@@ -127,9 +136,8 @@ void main() {
     final service = _AuthServiceForProfile(null);
     final auth = AuthProvider(service);
     await auth.init();
-    final router = _router(auth);
 
-    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+    await _pumpProfile(tester, auth);
     await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -139,13 +147,13 @@ void main() {
     final service = _AuthServiceForProfile(_user());
     final auth = AuthProvider(service);
     await auth.init();
-    final router = _router(auth);
 
-    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-    await tester.pumpAndSettle();
+    await _pumpProfile(tester, auth);
+    await tester.pump(const Duration(milliseconds: 400));
 
     await tester.tap(find.text('Log out'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump();
 
     expect(service.logoutCalls, 1);
     expect(find.text('login-target'), findsOneWidget);
