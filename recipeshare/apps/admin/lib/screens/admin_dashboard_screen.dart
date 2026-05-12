@@ -109,28 +109,24 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         alignment: Alignment.topCenter,
                         child: ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: maxContentWidth),
-                          child: IndexedStack(
-                            index: _navIndex,
-                            sizing: StackFit.expand,
-                            children: [
-                              const AdminStatisticsTab(),
-                              categoriesApi == null
-                                  ? const _ApiRequiredMessage()
-                                  : AdminCatalogTab(
-                                      api: categoriesApi,
-                                      singular: 'Category',
-                                    ),
-                              tagsApi == null
-                                  ? const _ApiRequiredMessage()
-                                  : AdminCatalogTab(
-                                      api: tagsApi,
-                                      singular: 'Tag',
-                                    ),
-                              const AdminRecipesTab(),
-                              const AdminUsersTab(),
-                              const AdminReportsTab(),
-                            ],
-                          ),
+                          child: switch (_navIndex) {
+                            0 => const AdminStatisticsTab(),
+                            1 => categoriesApi == null
+                                ? const _ApiRequiredMessage()
+                                : AdminCatalogTab(
+                                    api: categoriesApi,
+                                    singular: 'Category',
+                                  ),
+                            2 => tagsApi == null
+                                ? const _ApiRequiredMessage()
+                                : AdminCatalogTab(
+                                    api: tagsApi,
+                                    singular: 'Tag',
+                                  ),
+                            3 => const AdminRecipesTab(),
+                            4 => const AdminUsersTab(),
+                            _ => const AdminReportsTab(),
+                          },
                         ),
                       );
                     },

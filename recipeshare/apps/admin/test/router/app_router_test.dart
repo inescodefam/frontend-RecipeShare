@@ -79,16 +79,34 @@ User _user() => const User(
       recipesCount: 0,
     );
 
-Future<GoRouter> _pumpRouter(WidgetTester tester, AuthProvider auth) async {
-  final router = AppRouter.create(auth);
+Future<GoRouter> _pumpRouter(
+  WidgetTester tester,
+  AuthProvider auth, {
+  String initialLocation = '/splash',
+}) async {
+  final router = AppRouter.create(auth, initialLocation: initialLocation);
+  final services = RecipeShareServices.mock();
   await tester.pumpWidget(
-    ChangeNotifierProvider<AuthProvider>.value(
-      value: auth,
+    MultiProvider(
+      providers: [
+        Provider<RecipeShareServices>.value(value: services),
+        ChangeNotifierProvider<AuthProvider>.value(value: auth),
+        Provider<HttpAdminCategoriesService?>.value(value: null),
+        Provider<HttpAdminTagsService?>.value(value: null),
+      ],
       child: MaterialApp.router(routerConfig: router),
     ),
   );
-  await tester.pumpAndSettle();
+  await tester.pump();
+  if (initialLocation == '/splash') {
+    await tester.pump(const Duration(milliseconds: 600));
+  }
   return router;
+}
+
+Future<void> _pumpRouteChange(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
 }
 
 void main() {
@@ -96,20 +114,22 @@ void main() {
     final auth = AuthProvider(_RouterAuthService(null));
     final router = await _pumpRouter(tester, auth);
     router.go('/dashboard');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
 
     expect(router.routeInformationProvider.value.uri.toString(), '/login');
   });
 
   testWidgets('signed in user is redirected from auth pages to /dashboard', (tester) async {
-    final auth = AuthProvider(_RouterAuthService(_user()));
-    final router = await _pumpRouter(tester, auth);
-    router.go('/login');
-    await tester.pumpAndSettle();
+    final authService = _RouterAuthService(_user());
+    final auth = AuthProvider(authService);
+    await auth.init();
+    final router = await _pumpRouter(tester, auth, initialLocation: '/login');
     expect(router.routeInformationProvider.value.uri.toString(), '/dashboard');
 
     router.go('/register');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
     expect(router.routeInformationProvider.value.uri.toString(), '/dashboard');
+
+    await tester.pump(const Duration(milliseconds: 400));
   });
 }
