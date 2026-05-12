@@ -152,6 +152,22 @@ class HttpAdminService implements AdminService {
     });
   }
 
+  @override
+  Future<List<AdminRecipeListItem>> getAdminRecipesForAuthor(int authorId) async {
+    final recipes = <AdminRecipeListItem>[];
+    var page = 1;
+    var hasNext = true;
+
+    while (hasNext) {
+      final pageResult = await getAdminRecipes(pageNumber: page, pageSize: 50);
+      recipes.addAll(pageResult.items.where((recipe) => recipe.authorId == authorId));
+      hasNext = pageResult.hasNextPage;
+      page += 1;
+    }
+
+    return recipes;
+  }
+
   AdminRecipeListItem _recipeListItemFromDetail(AdminRecipeDetail detail) {
     return AdminRecipeListItem(
       id: detail.id,

@@ -197,7 +197,35 @@ class MockAdminService implements AdminService {
       averageRating: recipe.averageRating,
       ratingCount: recipe.ratingCount,
       comments: const [],
+      ingredients: recipe.ingredients,
+      steps: recipe.steps,
     );
+  }
+
+  @override
+  Future<List<AdminRecipeListItem>> getAdminRecipesForAuthor(int authorId) async {
+    final recipes = await _data.getRecipes();
+    return recipes
+        .where((recipe) => int.tryParse(recipe.userId) == authorId)
+        .map(
+          (recipe) => AdminRecipeListItem(
+            id: int.tryParse(recipe.id) ?? 0,
+            title: recipe.title,
+            imageUrl: recipe.photoUrl.isEmpty ? null : recipe.photoUrl,
+            isFeatured: recipe.isFeature,
+            isDeleted: false,
+            createdAt: recipe.createdAt,
+            difficulty: recipe.difficulty,
+            authorUsername: recipe.authorUsername ?? '',
+            authorId: int.tryParse(recipe.userId) ?? 0,
+            categoryName: recipe.categoryLabel ?? '',
+            likeCount: recipe.likesCount,
+            commentCount: recipe.commentCount,
+            averageRating: recipe.averageRating,
+            ratingCount: recipe.ratingCount,
+          ),
+        )
+        .toList();
   }
 
   @override
@@ -317,6 +345,18 @@ class MockAdminService implements AdminService {
     );
     final recipes = await _data.getRecipes();
     final ownedRecipes = recipes.where((recipe) => recipe.userId == user.id).toList();
+    final recentRecipes = ownedRecipes
+        .map(
+          (recipe) => AdminUserRecipeItem(
+            id: int.tryParse(recipe.id) ?? 0,
+            title: recipe.title,
+            imageUrl: recipe.photoUrl.isEmpty ? null : recipe.photoUrl,
+            createdAt: recipe.createdAt,
+            isFeatured: recipe.isFeature,
+            isDeleted: false,
+          ),
+        )
+        .toList();
     return AdminUserDetail(
       id: int.tryParse(user.id) ?? id,
       username: user.username,
@@ -331,6 +371,7 @@ class MockAdminService implements AdminService {
       ratingCount: ownedRecipes.fold<int>(0, (sum, recipe) => sum + recipe.ratingCount),
       followerCount: user.followersCount,
       followingCount: user.followingCount,
+      recentRecipes: recentRecipes,
     );
   }
 

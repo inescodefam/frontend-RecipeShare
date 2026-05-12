@@ -14,6 +14,20 @@ Future<bool> showAdminUserDetailDialog(
   ).then((value) => value ?? false);
 }
 
+Future<bool> showAdminUserRecipesDialog(
+  BuildContext context, {
+  required int userId,
+  required String username,
+}) {
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => _AdminUserRecipesDialog(
+      userId: userId,
+      username: username,
+    ),
+  ).then((value) => value ?? false);
+}
+
 Future<bool> showAdminRecipeDetailDialog(
   BuildContext context, {
   required int recipeId,
@@ -90,6 +104,18 @@ class _AdminUserDetailDialogState extends State<_AdminUserDetailDialog> {
     }
   }
 
+  Future<void> _showRecipes(AdminUserDetail user) async {
+    final changed = await showAdminUserRecipesDialog(
+      context,
+      userId: user.id,
+      username: user.username,
+    );
+    if (changed) {
+      _changed = true;
+      await _load();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = _user;
@@ -145,6 +171,10 @@ class _AdminUserDetailDialogState extends State<_AdminUserDetailDialog> {
                                           ),
                                   child: Text(user.isDeleted ? 'Restore' : 'Delete'),
                                 ),
+                                FilledButton.tonal(
+                                  onPressed: _busy ? null : () => _showRecipes(user),
+                                  child: const Text('View recipes'),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 16),
@@ -164,6 +194,109 @@ class _AdminUserDetailDialogState extends State<_AdminUserDetailDialog> {
       actions: [
         TextButton(
           onPressed: _busy ? null : () => Navigator.pop(context, _changed),
+          child: const Text('Close'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AdminUserRecipesDialog extends StatefulWidget {
+  const _AdminUserRecipesDialog({
+    required this.userId,
+    required this.username,
+  });
+
+  final int userId;
+  final String username;
+
+  @override
+  State<_AdminUserRecipesDialog> createState() => _AdminUserRecipesDialogState();
+}
+
+class _AdminUserRecipesDialogState extends State<_AdminUserRecipesDialog> {
+  List<AdminRecipeListItem> _recipes = const [];
+  bool _loading = true;
+  String? _error;
+  bool _changed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final recipes = await context
+          .read<RecipeShareServices>()
+          .admin
+          .getAdminRecipesForAuthor(widget.userId);
+      if (!mounted) return;
+      setState(() {
+        _recipes = recipes;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _openRecipe(AdminRecipeListItem recipe) async {
+    final changed = await showAdminRecipeDetailDialog(context, recipeId: recipe.id);
+    if (changed) {
+      _changed = true;
+      await _load();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('${widget.username} recipes'),
+      content: SizedBox(
+        width: 720,
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
+                ? Text(_error!, style: const TextStyle(color: AppColors.error))
+                : _recipes.isEmpty
+                    ? const Text('This user has no recipes.')
+                    : Scrollbar(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: _recipes.length,
+                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final recipe = _recipes[index];
+                            return ListTile(
+                              title: Text(recipe.title),
+                              subtitle: Text(
+                                '${recipe.categoryName} • ${recipe.likeCount} likes • '
+                                '${recipe.averageRating.toStringAsFixed(1)} rating',
+                              ),
+                              trailing: recipe.isDeleted
+                                  ? const Text('Deleted')
+                                  : recipe.isFeatured
+                                      ? const Text('Featured')
+                                      : null,
+                              onTap: () => _openRecipe(recipe),
+                            );
+                          },
+                        ),
+                      ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, _changed),
           child: const Text('Close'),
         ),
       ],
@@ -239,7 +372,7 @@ class _AdminRecipeDetailDialogState extends State<_AdminRecipeDetailDialog> {
     return AlertDialog(
       title: Text(recipe == null ? 'Recipe details' : recipe.title),
       content: SizedBox(
-        width: 640,
+        width: 720,
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : _error != null
@@ -303,9 +436,29 @@ class _AdminRecipeDetailDialogState extends State<_AdminRecipeDetailDialog> {
                                 ),
                               ],
                             ),
+                            if (recipe.imageUrl != null && recipe.imageUrl!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  recipe.imageUrl!,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             _DetailLine(label: 'Author', value: recipe.authorUsername),
                             _DetailLine(label: 'Category', value: recipe.categoryName),
+                            _DetailLine(label: 'Difficulty', value: recipe.difficulty.name),
+                            _DetailLine(
+                              label: 'Time',
+                              value:
+                                  '${recipe.prepTimeMinutes} min prep, ${recipe.cookTimeMinutes} min cook',
+                            ),
+                            _DetailLine(label: 'Servings', value: '${recipe.servings}'),
                             _DetailLine(label: 'Likes', value: '${recipe.likeCount}'),
                             _DetailLine(label: 'Comments', value: '${recipe.commentCount}'),
                             _DetailLine(
@@ -314,8 +467,36 @@ class _AdminRecipeDetailDialogState extends State<_AdminRecipeDetailDialog> {
                                   '${recipe.averageRating.toStringAsFixed(1)} (${recipe.ratingCount})',
                             ),
                             _DetailLine(label: 'Deleted', value: recipe.isDeleted ? 'Yes' : 'No'),
+                            if (recipe.tags.isNotEmpty)
+                              _DetailLine(label: 'Tags', value: recipe.tags.join(', ')),
                             if (recipe.description != null && recipe.description!.trim().isNotEmpty)
                               _DetailLine(label: 'Description', value: recipe.description!),
+                            if (recipe.ingredients.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              Text('Ingredients', style: Theme.of(context).textTheme.titleMedium),
+                              const SizedBox(height: 8),
+                              ...recipe.ingredients.map(
+                                (ingredient) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    ingredient.unit.isEmpty
+                                        ? '${ingredient.name} — ${ingredient.amount}'
+                                        : '${ingredient.name} — ${ingredient.amount} ${ingredient.unit}',
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (recipe.steps.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              Text('Steps', style: Theme.of(context).textTheme.titleMedium),
+                              const SizedBox(height: 8),
+                              ...recipe.steps.map(
+                                (step) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Text('${step.stepNumber}. ${step.description}'),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
