@@ -145,6 +145,89 @@ class HttpAdminService implements AdminService {
   }
 
   @override
+  Future<AdminUserDetail> getAdminUserById(int id) {
+    return _request(() async {
+      final res = await _dio.get<Map<String, dynamic>>('/api/admin/users/$id');
+      return AdminUserDetail.fromJson(res.data ?? const <String, dynamic>{});
+    });
+  }
+
+  @override
+  Future<List<AdminRecipeListItem>> getAdminRecipesForAuthor(int authorId) async {
+    final recipes = <AdminRecipeListItem>[];
+    var page = 1;
+    var hasNext = true;
+
+    while (hasNext) {
+      final pageResult = await getAdminRecipes(pageNumber: page, pageSize: 50);
+      recipes.addAll(pageResult.items.where((recipe) => recipe.authorId == authorId));
+      hasNext = pageResult.hasNextPage;
+      page += 1;
+    }
+
+    return recipes;
+  }
+
+  AdminRecipeListItem _recipeListItemFromDetail(AdminRecipeDetail detail) {
+    return AdminRecipeListItem(
+      id: detail.id,
+      title: detail.title,
+      imageUrl: detail.imageUrl,
+      isFeatured: detail.isFeatured,
+      isDeleted: detail.isDeleted,
+      deletedAt: detail.deletedAt,
+      createdAt: detail.createdAt,
+      difficulty: detail.difficulty,
+      authorUsername: detail.authorUsername,
+      authorId: detail.authorId,
+      categoryName: detail.categoryName,
+      likeCount: detail.likeCount,
+      commentCount: detail.commentCount,
+      averageRating: detail.averageRating,
+      ratingCount: detail.ratingCount,
+    );
+  }
+
+  @override
+  Future<AdminDashboardStats> getAdminDashboard() {
+    return _request(() async {
+      final dashboardRes = await _dio.get<Map<String, dynamic>>('/api/admin/dashboard');
+      final summary = AdminDashboardSummary.fromJson(
+        dashboardRes.data ?? const <String, dynamic>{},
+      );
+
+      final reportsRes = await _dio.get<Map<String, dynamic>>(
+        '/api/admin/reports',
+        queryParameters: <String, dynamic>{
+          'PageNumber': 1,
+          'PageSize': 1,
+          'ReportStatus': reportStatusToApi(ReportStatus.pending),
+        },
+      );
+      final pendingReports = reportsRes.data?['totalCount'] as int? ?? 0;
+
+      final activeUsers = <AdminUserDetail>[];
+      for (final userId in summary.mostActiveUserIds) {
+        activeUsers.add(await getAdminUserById(userId));
+      }
+
+      final popularRecipes = <AdminRecipeListItem>[];
+      for (final recipeId in summary.mostPopularRecipeIds) {
+        final detail = await getAdminRecipeById(recipeId);
+        popularRecipes.add(_recipeListItemFromDetail(detail));
+      }
+
+      return AdminDashboardStats(
+        totalUsers: summary.totalUsers,
+        totalRecipes: summary.totalRecipes,
+        pendingReports: pendingReports,
+        mostActiveUsers: activeUsers,
+        mostPopularRecipes: popularRecipes,
+      );
+    });
+  }
+
+  @override
   Future<void> setUserBlocked(String userId, bool blocked) async {
     await toggleUserBlocked(userId);
   }
