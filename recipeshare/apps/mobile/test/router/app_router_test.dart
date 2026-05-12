@@ -82,16 +82,43 @@ User _user() => const User(
       recipesCount: 0,
     );
 
-Future<GoRouter> _pumpRouter(WidgetTester tester, AuthProvider auth) async {
-  final router = AppRouter.create(auth);
+Future<void> _pumpRouteChange(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
+}
+
+Future<void> _flushMockTimers(WidgetTester tester) async {
+  await tester.pump(const Duration(milliseconds: 400));
+  await tester.pump(const Duration(milliseconds: 400));
+}
+
+Future<GoRouter> _pumpRouter(
+  WidgetTester tester,
+  AuthProvider auth, {
+  String initialLocation = '/splash',
+}) async {
+  final router = AppRouter.create(auth, initialLocation: initialLocation);
+  final services = RecipeShareServices.mock();
   await tester.pumpWidget(
-    ChangeNotifierProvider<AuthProvider>.value(
-      value: auth,
+    MultiProvider(
+      providers: [
+        Provider<RecipeShareServices>.value(value: services),
+        ChangeNotifierProvider<AuthProvider>.value(value: auth),
+      ],
       child: MaterialApp.router(routerConfig: router),
     ),
   );
-  await tester.pumpAndSettle();
+  await tester.pump();
+  if (initialLocation == '/splash') {
+    await tester.pump(const Duration(milliseconds: 600));
+  }
   return router;
+}
+
+Future<AuthProvider> _loggedInAuth() async {
+  final auth = AuthProvider(_RouterAuthService(_user()));
+  await auth.init();
+  return auth;
 }
 
 void main() {
@@ -99,49 +126,51 @@ void main() {
     final auth = AuthProvider(_RouterAuthService(null));
     final router = await _pumpRouter(tester, auth);
     router.go('/home/profile');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
 
     expect(router.routeInformationProvider.value.uri.toString(), '/login');
+    await _flushMockTimers(tester);
   });
 
   testWidgets('logged in user is redirected away from login/register/home', (tester) async {
-    final auth = AuthProvider(_RouterAuthService(_user()));
-    final router = await _pumpRouter(tester, auth);
-
-    router.go('/login');
-    await tester.pumpAndSettle();
+    final auth = await _loggedInAuth();
+    final router = await _pumpRouter(tester, auth, initialLocation: '/login');
     expect(router.routeInformationProvider.value.uri.toString(), '/home/feed');
 
     router.go('/register');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
     expect(router.routeInformationProvider.value.uri.toString(), '/home/feed');
 
     router.go('/home');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
     expect(router.routeInformationProvider.value.uri.toString(), '/home/feed');
+    await _flushMockTimers(tester);
   });
 
-  testWidgets('logged in user can open shell and recipe detail routes', (tester) async {
-    final auth = AuthProvider(_RouterAuthService(_user()));
-    final router = await _pumpRouter(tester, auth);
-
-    router.go('/home/explore');
-    await tester.pumpAndSettle();
+  testWidgets('logged in user can open shell routes', (tester) async {
+    final auth = await _loggedInAuth();
+    final router = await _pumpRouter(tester, auth, initialLocation: '/home/explore');
     expect(router.routeInformationProvider.value.uri.toString(), '/home/explore');
 
     router.go('/home/profile');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
     expect(router.routeInformationProvider.value.uri.toString(), '/home/profile');
 
     router.go('/home/profile/settings');
-    await tester.pumpAndSettle();
+    await _pumpRouteChange(tester);
     expect(
       router.routeInformationProvider.value.uri.toString(),
       '/home/profile/settings',
     );
 
-    router.go('/recipes/r1');
-    await tester.pumpAndSettle();
+    await _flushMockTimers(tester);
+  });
+
+  testWidgets('logged in user can open recipe detail route', (tester) async {
+    final auth = await _loggedInAuth();
+    final router = await _pumpRouter(tester, auth, initialLocation: '/recipes/r1');
     expect(router.routeInformationProvider.value.uri.toString(), '/recipes/r1');
+
+    await _flushMockTimers(tester);
   });
 }
