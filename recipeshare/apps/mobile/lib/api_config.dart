@@ -13,6 +13,14 @@ String resolveApiBaseUrl() {
   return 'http://localhost:5285';
 }
 
+/// Optional public link base for recipe sharing (`--dart-define=SHARE_BASE_URL=...`).
+String? resolveRecipeShareLink(String recipeId) {
+  const base = String.fromEnvironment('SHARE_BASE_URL');
+  if (base.isEmpty) return null;
+  final normalized = base.endsWith('/') ? base.substring(0, base.length - 1) : base;
+  return '$normalized/recipes/$recipeId';
+}
+
 /// Set `--dart-define=USE_MOCK_DATA=true` to use bundled JSON mock auth instead of the API.
 bool get useMockServices {
   const v = String.fromEnvironment('USE_MOCK_DATA', defaultValue: 'false');

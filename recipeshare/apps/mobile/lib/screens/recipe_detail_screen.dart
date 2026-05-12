@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:shared/shared.dart';
 
 import '../providers/auth_provider.dart';
+import '../utils/recipe_share.dart';
 import '../widgets/report_content_dialog.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
@@ -151,6 +152,21 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
   bool _isDuplicateReportError(Object error) {
     return _messageFromError(error).toLowerCase().contains('already reported');
+  }
+
+  Future<void> _shareRecipe(Recipe recipe, String authorName, BuildContext buttonContext) async {
+    try {
+      final box = buttonContext.findRenderObject() as RenderBox?;
+      final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
+      await shareRecipe(
+        recipe,
+        authorName: authorName,
+        sharePositionOrigin: origin,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   Future<void> _confirmDeleteRecipe(RecipeShareServices services, String id) async {
@@ -441,6 +457,13 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               onPressed: _goBackOrFeed,
             ),
             actions: [
+              Builder(
+                builder: (buttonContext) => IconButton(
+                  tooltip: 'Share recipe',
+                  onPressed: () => _shareRecipe(recipe, author.username, buttonContext),
+                  icon: const Icon(Icons.ios_share_rounded),
+                ),
+              ),
               if (canReportRecipe)
                 IconButton(
                   tooltip: 'Report recipe',
